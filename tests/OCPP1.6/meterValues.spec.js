@@ -1,4 +1,5 @@
 import { test } from '../../fixtures/ocppFixture';
+import { waitForResponse } from '../../utils/waitForResponse';
 import stateManager from '../../utils/stateManager';
 
 test.describe.serial('@carga 📊 Reportar MeterValues', () => {
@@ -7,33 +8,40 @@ test.describe.serial('@carga 📊 Reportar MeterValues', () => {
             console.log('🚀 Transacción no activa, iniciando StartTransaction automáticamente...');
             if (!stateManager.state.bootNotificationSent) {
                 console.log('📢 BootNotification no enviado, enviando ahora...');
-                ocppClient.sendMessage([2, "001", "BootNotification", {
-                    chargePointVendor: "Dhemax",
-                    chargePointModel: "Model-X"
-                }]);
+                const bootUniqueId = ocppClient.sendBootNotification(
+                    "Dhemax",
+                    "Model-X",
+                    "SN-12345678",
+                    "EV.2S7P04",
+                    "3.3.0.10",
+                    "8901120000000000000",
+                    "123456789012345",
+                    "DhemaxMeter",
+                    "MTR-001"
+                );
+                await waitForResponse(ocppClient, bootUniqueId);
                 stateManager.saveState({ bootNotificationSent: true });
             }
             if (!stateManager.state.authorized) {
                 console.log('✅ Authorize no enviado, enviando ahora...');
-                ocppClient.sendMessage([2, "002", "Authorize", {
-                    idTag: process.env.ID_TAG
-                }]);
+                const authUniqueId = ocppClient.sendAuthorize(process.env.ID_TAG);
+                await waitForResponse(ocppClient, authUniqueId);
                 stateManager.saveState({ authorized: true });
             }
-            const transactionId = "003"; 
-            ocppClient.sendMessage([2, "003", "StartTransaction", {
-                connectorId: Number(process.env.CONNECTOR_ID),
-                idTag: process.env.ID_TAG,
-                meterStart: 100,
-                timestamp: new Date().toISOString()
-            }]);
-            stateManager.saveState({ transactionId });
+            const startUniqueId = ocppClient.sendStartTransaction(
+                Number(process.env.CONNECTOR_ID),
+                process.env.ID_TAG,
+                100,
+                new Date().toISOString()
+            );
+            const startResponse = await waitForResponse(ocppClient, startUniqueId);
+            stateManager.saveState({ transactionId: startResponse.transactionId });
         }
 
-        for (let i = 1; i <= 3; i++) { 
-            ocppClient.sendMessage([2, `004-${i}`, "MeterValues", {
-                transactionId: stateManager.state.transactionId,
-                meterValue: [{
+        for (let i = 1; i <= 3; i++) {
+            const uniqueId = ocppClient.sendMeterValues(
+                stateManager.state.transactionId,
+                [{
                     timestamp: new Date().toISOString(),
                     sampledValue: [{
                         value: `${100 + i * 50}`,
@@ -41,7 +49,10 @@ test.describe.serial('@carga 📊 Reportar MeterValues', () => {
                         measurand: "Energy.Active.Import.Register"
                     }]
                 }]
-            }]);
+            );
+
+            const response = await waitForResponse(ocppClient, uniqueId);
+            console.log(`📥 Respuesta MeterValues (${i}):`, response);
 
             // Se reduce el tiempo de espera para pruebas
             await new Promise(resolve => setTimeout(resolve, 1000));

@@ -6,17 +6,22 @@ test.describe.serial('@carga ✅ Enviar Authorize', () => {
     test('✅ Authorize', async ({ ocppClient }) => {
         if (!stateManager.state.bootNotificationSent) {
             console.log('📢 BootNotification no enviado, enviando ahora...');
-            ocppClient.sendMessage([2, "001", "BootNotification", {
-                chargePointVendor: "Dhemax",
-                chargePointModel: "Model-X"
-            }]);
+            const bootUniqueId = ocppClient.sendBootNotification(
+                "Dhemax",
+                "Model-X",
+                "SN-12345678",
+                "EV.2S7P04",
+                "3.3.0.10",
+                "8901120000000000000",
+                "123456789012345",
+                "DhemaxMeter",
+                "MTR-001"
+            );
+            await waitForResponse(ocppClient, bootUniqueId);
             stateManager.saveState({ bootNotificationSent: true });
         }
 
-        const authReqId = "002";
-        ocppClient.sendMessage([2, authReqId, "Authorize", {
-            idTag: process.env.ID_TAG
-        }]);
+        const authReqId = ocppClient.sendAuthorize(process.env.ID_TAG);
 
         // Esperar la respuesta “Authorize” antes de marcar authorized
         const authRes = await waitForResponse(ocppClient, authReqId);

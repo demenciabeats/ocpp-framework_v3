@@ -9,11 +9,17 @@ test.describe.serial('@carga 📢 Enviar BootNotification', () => {
             return;
         }
 
-        const uniqueId = "001";
-        ocppClient.sendMessage([2, uniqueId, "BootNotification", {
-            chargePointVendor: "Dhemax",
-            chargePointModel: "Model-X"
-        }]);
+        const uniqueId = ocppClient.sendBootNotification(
+            "Dhemax",
+            "Model-X",
+            "SN-12345678",
+            "EV.2S7P04",
+            "3.3.0.10",
+            "8901120000000000000",
+            "123456789012345",
+            "DhemaxMeter",
+            "MTR-001"
+        );
 
         const response = await waitForResponse(ocppClient, uniqueId);
         console.log('<= Respuesta BootNotification:', response);

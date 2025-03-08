@@ -1,4 +1,5 @@
 import { test } from '../../fixtures/ocppFixture';
+import { waitForResponse } from '../../utils/waitForResponse';
 import { execFileSync } from 'child_process';
 import path from 'path';
 import stateManager from '../../utils/stateManager';
@@ -15,24 +16,18 @@ test.describe.serial('@carga 🛑 Finalizar StopTransaction', () => {
 
         // 2. Enviamos StatusNotification cada 10s durante 60s para mantener la conexión
         console.log('⏳ Manteniendo la carga activa y enviando StatusNotification cada 10s durante 1 minuto...');
-        for (let i = 0; i < 12; i++) {
+        for (let i = 0; i < 6; i++) {
             await new Promise(resolve => setTimeout(resolve, 10000));
-            ocppClient.sendMessage([2, `status-${i}`, "StatusNotification", {
-                connectorId: Number(process.env.CONNECTOR_ID),
-                status: "Charging",
-                errorCode: "NoError",
-                timestamp: new Date().toISOString()
-            }]);
+            ocppClient.sendStatusNotification(Number(process.env.CONNECTOR_ID), "Charging", "NoError");
             console.log(`⏱ StatusNotification #${i + 1} enviado`);
         }
 
         // 3. Enviamos StopTransaction con el transactionId real
         console.log('🛑 Enviando StopTransaction...');
-        ocppClient.sendMessage([2, "006", "StopTransaction", {
-            transactionId,
-            meterStop: 300,
-            timestamp: new Date().toISOString()
-        }]);
+        const uniqueId = ocppClient.sendStopTransaction(transactionId, 300, new Date().toISOString());
+
+        const response = await waitForResponse(ocppClient, uniqueId);
+        console.log("📥 Respuesta recibida:", response);
 
         console.log('📊 Ejecutando análisis de MeterValues...');
         execFileSync('node', [scriptPath], { stdio: 'inherit' });
