@@ -51,15 +51,15 @@ export function sendStartTransaction(ocppClient, startData) {
     return uniqueId;
 }
 
-export function sendMeterValues(ocppClient, transactionId, meterValue) {
-    const uniqueId = generateUniqueId();
+export function sendMeterValues(ocppClient, connectorId, transactionId, meterValues, uniqueId) {
     const message = [
         2,
         uniqueId,
         "MeterValues",
         {
+            connectorId, // Asegurarse de incluir el connectorId
             transactionId,
-            meterValue
+            meterValue: meterValues
         }
     ];
     ocppClient.sendMessage(message);

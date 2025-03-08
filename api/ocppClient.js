@@ -96,13 +96,14 @@ class OcppClient {
         return uniqueId;
     }
 
-    sendMeterValues(transactionId, meterValue) {
+    sendMeterValues(connectorId, transactionId, meterValue) {
         const uniqueId = generateUniqueId();
         const message = [
             2,
             uniqueId,
             "MeterValues",
             {
+                connectorId,  // Ahora se incluye el connectorId
                 transactionId,
                 meterValue
             }
@@ -176,24 +177,42 @@ class OcppClient {
                 timestamp: new Date().toISOString(),
                 sampledValue: [
                     {
-                        value: `${meterValueCounter}`,
-                        unit: "Wh",
-                        measurand: "Energy.Active.Import.Register"
-                    },
-                    {
-                        value: `${power}`,
-                        unit: "W",
-                        measurand: "Power.Active.Import"
-                    },
-                    {
                         value: `${currentSoc.toFixed(2)}`,
-                        unit: "%",
-                        measurand: "SoC"
+                        unit: "Percent",
+                        context: "Sample.Periodic",
+                        format: "Raw",
+                        measurand: "SoC",
+                        location: "EVSE"
+                    },
+                    {
+                        value: `${power.toFixed(2)}`,
+                        unit: "W",
+                        context: "Sample.Periodic",
+                        format: "Raw",
+                        measurand: "Power.Active.Import",
+                        location: "Outlet"
+                    },
+                    {
+                        value: `${energyDelivered.toFixed(2)}`,
+                        unit: "A",
+                        context: "Sample.Periodic",
+                        format: "Raw",
+                        measurand: "Current.Import",
+                        location: "Outlet"
+                    },
+                    {
+                        value: `${meterValueCounter.toFixed(2)}`,
+                        unit: "Wh",
+                        context: "Sample.Periodic",
+                        format: "Raw",
+                        measurand: "Energy.Active.Import.Register",
+                        location: "Outlet"
                     }
                 ]
             };
 
-            this.sendMeterValues(transactionId, [meterValue]);
+            // Ahora se pasa connector.connectorId
+            this.sendMeterValues(connector.connectorId, transactionId, [meterValue]);
             durationSeconds -= intervalSeconds;
         }, intervalSeconds * 1000);
     }
