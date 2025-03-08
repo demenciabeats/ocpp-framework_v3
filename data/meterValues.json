@@ -1,0 +1,18 @@
+[
+    {
+      "transactionId": "003",
+      "meterValue": [
+        {
+          "timestamp": "2025-03-06T03:06:17.889Z",
+          "sampledValue": [
+            {
+              "value": "1500",
+              "unit": "Wh",
+              "measurand": "Energy.Active.Import.Register"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+  
