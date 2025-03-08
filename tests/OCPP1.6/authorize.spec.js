@@ -2,8 +2,7 @@ import { test } from '../../fixtures/ocppFixture';
 import stateManager from '../../utils/stateManager';
 import { waitForResponse } from '../../utils/waitForResponse';
 import fs from 'fs';
-
-const testData = JSON.parse(fs.readFileSync('./data/testData.json', 'utf-8'));
+const testData = JSON.parse(fs.readFileSync('../../data/testData.json', 'utf-8'));
 
 test.describe.serial('@carga ✅ Enviar Authorize', () => {
     test('✅ Authorize', async ({ ocppClient }) => {

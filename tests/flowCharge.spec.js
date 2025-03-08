@@ -1,10 +1,18 @@
-import { test } from '../../fixtures/ocppFixture';
-import stateManager from '../../utils/stateManager';
-import { waitForResponse } from '../../utils/waitForResponse';
+import { test } from '../fixtures/ocppFixture';
+import stateManager from '../utils/stateManager';
+import testData from '../data/testData';
+import {
+    bootNotification,
+    authorize,
+    startTransaction,
+    stopTransaction,
+    heartbeat,
+    statusNotification,
+    simulateCharging
+} from '../utils/testHelpers';
+import { execFileSync } from 'child_process';
 import path from 'path';
-import fs from 'fs';
 
-const testData = JSON.parse(fs.readFileSync('./data/testData.json', 'utf-8'));
 const scriptPath = path.join(process.cwd(), 'utils', 'analyzeMeterValues.js');
 
 test.describe.serial('@carga FlujoCompleto', () => {
@@ -13,20 +21,7 @@ test.describe.serial('@carga FlujoCompleto', () => {
      * 1. BootNotification (si no se ha enviado aún)
      */
     if (!stateManager.state.bootNotificationSent) {
-      const bootData = testData.bootNotification;
-      const bootReqId = ocppClient.sendBootNotification(
-        bootData.vendor,
-        bootData.model,
-        bootData.serialNumber,
-        bootData.chargeBoxSerialNumber,
-        bootData.firmwareVersion,
-        bootData.iccid,
-        bootData.imsi,
-        bootData.meterType,
-        bootData.meterSerialNumber
-      );
-
-      const bootRes = await waitForResponse(ocppClient, bootReqId);
+      const bootRes = await bootNotification(ocppClient, testData.bootNotification);
       console.log('<= Respuesta BootNotification:', bootRes);
       stateManager.saveState({ bootNotificationSent: true });
     } else {
@@ -37,19 +32,18 @@ test.describe.serial('@carga FlujoCompleto', () => {
      * 2. StatusNotification (Available)
      */
     console.log('⚡ Enviando StatusNotification (Available)...');
-    const statusReqId = ocppClient.sendStatusNotification(
-      testData.startTransaction.connectorId,
-      "Available",
-      "NoError"
-    );
-    await waitForResponse(ocppClient, statusReqId);
+    const statusRes = await statusNotification(ocppClient, {
+      connectorId: testData.startTransaction.connectorId,
+      status: "Available",
+      errorCode: "NoError"
+    });
+    console.log('<= Respuesta StatusNotification:', statusRes);
 
     /**
      * 3. Authorize (si no se ha autorizado aún)
      */
     if (!stateManager.state.authorized) {
-      const authReqId = ocppClient.sendAuthorize(testData.authorize.idTag);
-      const authRes = await waitForResponse(ocppClient, authReqId);
+      const authRes = await authorize(ocppClient, testData.authorize.idTag);
       console.log('<= Respuesta Authorize:', authRes);
       stateManager.saveState({ authorized: true });
     } else {
@@ -60,14 +54,7 @@ test.describe.serial('@carga FlujoCompleto', () => {
      * 4. StartTransaction (obtener transactionId real)
      */
     if (!stateManager.state.transactionId) {
-      const startData = testData.startTransaction;
-      const startReqId = ocppClient.sendStartTransaction(
-        startData.connectorId,
-        startData.idTag,
-        startData.meterStart,
-        startData.timestamp
-      );
-      const startRes = await waitForResponse(ocppClient, startReqId);
+      const startRes = await startTransaction(ocppClient, testData.startTransaction);
       console.log('<= Respuesta StartTransaction:', startRes);
 
       if (startRes?.idTagInfo?.status === "Accepted") {
@@ -92,7 +79,8 @@ test.describe.serial('@carga FlujoCompleto', () => {
     const connector = testData.connector;
 
     // Iniciar el envío de MeterValues
-    await ocppClient.generateAndSendMeterValues(
+    const meterValuesPromise = simulateCharging(
+      ocppClient,
       txId,
       intervalSeconds,
       durationSeconds,
@@ -102,29 +90,35 @@ test.describe.serial('@carga FlujoCompleto', () => {
     /**
      * 6. Enviar Heartbeat después de 1 minuto de carga
      */
-    setTimeout(async () => {
-      console.log('🩺 Enviando Heartbeat...');
-      const heartbeatReqId = ocppClient.sendHeartbeat();
-      const heartbeatRes = await waitForResponse(ocppClient, heartbeatReqId);
-      console.log('<= Respuesta Heartbeat:', heartbeatRes);
-    }, 60000); // 1 minuto
+    const heartbeatPromise = new Promise((resolve) => {
+      setTimeout(async () => {
+        console.log('🩺 Enviando Heartbeat...');
+        const heartbeatRes = await heartbeat(ocppClient);
+        console.log('<= Respuesta Heartbeat:', heartbeatRes);
+        resolve();
+      }, 60000); // 1 minuto
+    });
 
     /**
      * 7. StopTransaction después de 1:30 minutos de carga
      */
-    setTimeout(async () => {
-      console.log('🛑 Enviando StopTransaction...');
-      const stopData = testData.stopTransaction;
-      const stopReqId = ocppClient.sendStopTransaction(
-        txId,
-        stopData.meterStop,
-        stopData.timestamp
-      );
-      const stopRes = await waitForResponse(ocppClient, stopReqId, 10000);
-      console.log('<= Respuesta StopTransaction:', stopRes);
+    const stopTransactionPromise = new Promise((resolve) => {
+      setTimeout(async () => {
+        console.log('🛑 Enviando StopTransaction...');
+        const stopRes = await stopTransaction(ocppClient, {
+          transactionId: txId,
+          meterStop: testData.stopTransaction.meterStop,
+          timestamp: testData.stopTransaction.timestamp
+        });
+        console.log('<= Respuesta StopTransaction:', stopRes);
 
-      console.log('📊 Ejecutando análisis de MeterValues...');
-      execFileSync('node', [scriptPath], { stdio: 'inherit' });
-    }, 90000); // 1:30 minutos
+        console.log('📊 Ejecutando análisis de MeterValues...');
+        execFileSync('node', [scriptPath], { stdio: 'inherit' });
+        resolve();
+      }, 90000); // 1:30 minutos
+    });
+
+    // Esperar a que todas las promesas se completen antes de cerrar la conexión
+    await Promise.all([meterValuesPromise, heartbeatPromise, stopTransactionPromise]);
   });
 });

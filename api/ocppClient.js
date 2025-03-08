@@ -1,5 +1,6 @@
 import WebSocket from 'ws';
 import { handleMessage } from './messageHandler';
+import { generateUniqueId } from './utils';
 
 class OcppClient {
     constructor(wsUrl, chargePointId) {
@@ -45,7 +46,7 @@ class OcppClient {
 
     // Métodos para construir y enviar mensajes OCPP específicos
     sendBootNotification(vendor, model, serialNumber, chargeBoxSerialNumber, firmwareVersion, iccid, imsi, meterType, meterSerialNumber) {
-        const uniqueId = this.generateUniqueId();
+        const uniqueId = generateUniqueId();
         const message = [
             2,
             uniqueId,
@@ -67,7 +68,7 @@ class OcppClient {
     }
 
     sendAuthorize(idTag) {
-        const uniqueId = this.generateUniqueId();
+        const uniqueId = generateUniqueId();
         const message = [
             2,
             uniqueId,
@@ -79,7 +80,7 @@ class OcppClient {
     }
 
     sendStartTransaction(connectorId, idTag, meterStart, timestamp) {
-        const uniqueId = this.generateUniqueId();
+        const uniqueId = generateUniqueId();
         const message = [
             2,
             uniqueId,
@@ -96,7 +97,7 @@ class OcppClient {
     }
 
     sendMeterValues(transactionId, meterValue) {
-        const uniqueId = this.generateUniqueId();
+        const uniqueId = generateUniqueId();
         const message = [
             2,
             uniqueId,
@@ -111,7 +112,7 @@ class OcppClient {
     }
 
     sendStopTransaction(transactionId, meterStop, timestamp) {
-        const uniqueId = this.generateUniqueId();
+        const uniqueId = generateUniqueId();
         const message = [
             2,
             uniqueId,
@@ -127,7 +128,7 @@ class OcppClient {
     }
 
     sendHeartbeat() {
-        const uniqueId = this.generateUniqueId();
+        const uniqueId = generateUniqueId();
         const message = [
             2,
             uniqueId,
@@ -138,8 +139,63 @@ class OcppClient {
         return uniqueId;
     }
 
-    generateUniqueId() {
-        return Math.random().toString(36).substr(2, 9);
+    sendStatusNotification(connectorId, status, errorCode) {
+        const uniqueId = generateUniqueId();
+        const message = [
+            2,
+            uniqueId,
+            "StatusNotification",
+            {
+                connectorId,
+                status,
+                errorCode,
+                timestamp: new Date().toISOString()
+            }
+        ];
+        this.sendMessage(message);
+        return uniqueId;
+    }
+
+    async generateAndSendMeterValues(transactionId, intervalSeconds, durationSeconds, connector) {
+        const { maxPower, batteryCapacity, initialSoc } = connector;
+        let currentSoc = initialSoc;
+        let meterValueCounter = 0;
+
+        const intervalId = setInterval(() => {
+            if (durationSeconds <= 0) {
+                clearInterval(intervalId);
+                return;
+            }
+
+            const power = maxPower * 1000; // Convertir kW a W
+            const energyDelivered = (power * intervalSeconds) / 3600; // Energía en Wh
+            meterValueCounter += energyDelivered;
+            currentSoc += (energyDelivered / (batteryCapacity * 1000)) * 100; // Actualizar SOC
+
+            const meterValue = {
+                timestamp: new Date().toISOString(),
+                sampledValue: [
+                    {
+                        value: `${meterValueCounter}`,
+                        unit: "Wh",
+                        measurand: "Energy.Active.Import.Register"
+                    },
+                    {
+                        value: `${power}`,
+                        unit: "W",
+                        measurand: "Power.Active.Import"
+                    },
+                    {
+                        value: `${currentSoc.toFixed(2)}`,
+                        unit: "%",
+                        measurand: "SoC"
+                    }
+                ]
+            };
+
+            this.sendMeterValues(transactionId, [meterValue]);
+            durationSeconds -= intervalSeconds;
+        }, intervalSeconds * 1000);
     }
 }
 

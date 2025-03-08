@@ -19,28 +19,15 @@
     "meterStart": 100,
     "timestamp": "2025-03-08T12:00:00Z"
   },
-  "meterValues": [
-    {
-      "timestamp": "2025-03-08T12:05:00Z",
-      "sampledValue": [
-        {
-          "value": "150",
-          "unit": "Wh",
-          "measurand": "Energy.Active.Import.Register"
-        }
-      ]
-    },
-    {
-      "timestamp": "2025-03-08T12:10:00Z",
-      "sampledValue": [
-        {
-          "value": "200",
-          "unit": "Wh",
-          "measurand": "Energy.Active.Import.Register"
-        }
-      ]
-    }
-  ],
+  "connector": {
+    "maxPower": 22,
+    "batteryCapacity": 50,
+    "initialSoc": 20
+  },
+  "meterValuesConfig": {
+    "intervalSeconds": 10,
+    "durationSeconds": 60
+  },
   "stopTransaction": {
     "meterStop": 300,
     "timestamp": "2025-03-08T12:15:00Z"

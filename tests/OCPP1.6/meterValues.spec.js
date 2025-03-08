@@ -43,17 +43,14 @@ test.describe.serial('@carga 📊 Reportar MeterValues', () => {
             stateManager.saveState({ transactionId: startResponse.transactionId });
         }
 
-        for (const meterValue of testData.meterValues) {
-            const uniqueId = ocppClient.sendMeterValues(
-                stateManager.state.transactionId,
-                [meterValue]
-            );
+        const { intervalSeconds, durationSeconds } = testData.meterValuesConfig;
+        const connector = testData.connector;
 
-            const response = await waitForResponse(ocppClient, uniqueId);
-            console.log(`📥 Respuesta MeterValues:`, response);
-
-            // Se reduce el tiempo de espera para pruebas
-            await new Promise(resolve => setTimeout(resolve, 1000));
-        }
+        await ocppClient.generateAndSendMeterValues(
+            stateManager.state.transactionId,
+            intervalSeconds,
+            durationSeconds,
+            connector
+        );
     });
 });
