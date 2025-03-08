@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test';
-import OcppClient from '../api/ocppClient';
-import { waitForResponse } from '../utils/waitForResponse';
+import OcppClient from '../../api/ocppClient';
+import { waitForResponse } from '../../utils/waitForResponse';
 import dotenv from 'dotenv';
 
 dotenv.config();

@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { waitForResponse } from '../utils/waitForResponse';
+import { waitForResponse } from '../../utils/waitForResponse';
 import dotenv from 'dotenv';
 
 dotenv.config();

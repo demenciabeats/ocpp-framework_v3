@@ -1,5 +1,5 @@
-import { test, expect } from '../fixtures/ocppFixture';
-import { waitForResponse } from '../utils/waitForResponse';
+import { test, expect } from '../../fixtures/ocppFixture';
+import { waitForResponse } from '../../utils/waitForResponse';
 
 test.describe('Ejemplo de Test OCPP con Fixture', () => {
     test('Enviar BootNotification y manejar respuesta', async ({ ocppClient }) => {
