@@ -2,7 +2,9 @@ import { test } from '../../fixtures/ocppFixture';
 import stateManager from '../../utils/stateManager';
 import { waitForResponse } from '../../utils/waitForResponse';
 import path from 'path';
+import fs from 'fs';
 
+const testData = JSON.parse(fs.readFileSync('./data/testData.json', 'utf-8'));
 const scriptPath = path.join(process.cwd(), 'utils', 'analyzeMeterValues.js');
 
 test.describe.serial('@carga FlujoCompleto', () => {
@@ -11,16 +13,17 @@ test.describe.serial('@carga FlujoCompleto', () => {
      * 1. BootNotification (si no se ha enviado aún)
      */
     if (!stateManager.state.bootNotificationSent) {
+      const bootData = testData.bootNotification;
       const bootReqId = ocppClient.sendBootNotification(
-        "infypower",
-        "Infi4ever",
-        "SN-12345678",
-        "EV.2S7P04",
-        "3.3.0.10",
-        "8901120000000000000",
-        "123456789012345",
-        "DhemaxMeter",
-        "MTR-001"
+        bootData.vendor,
+        bootData.model,
+        bootData.serialNumber,
+        bootData.chargeBoxSerialNumber,
+        bootData.firmwareVersion,
+        bootData.iccid,
+        bootData.imsi,
+        bootData.meterType,
+        bootData.meterSerialNumber
       );
 
       const bootRes = await waitForResponse(ocppClient, bootReqId);
@@ -34,7 +37,7 @@ test.describe.serial('@carga FlujoCompleto', () => {
      * 2. Authorize (si no se ha autorizado aún)
      */
     if (!stateManager.state.authorized) {
-      const authReqId = ocppClient.sendAuthorize(process.env.ID_TAG);
+      const authReqId = ocppClient.sendAuthorize(testData.authorize.idTag);
       const authRes = await waitForResponse(ocppClient, authReqId);
       console.log('<= Respuesta Authorize:', authRes);
       stateManager.saveState({ authorized: true });
@@ -46,11 +49,12 @@ test.describe.serial('@carga FlujoCompleto', () => {
      * 3. StartTransaction (obtener transactionId real)
      */
     if (!stateManager.state.transactionId) {
+      const startData = testData.startTransaction;
       const startReqId = ocppClient.sendStartTransaction(
-        Number(process.env.CONNECTOR_ID),
-        process.env.ID_TAG,
-        100,
-        new Date().toISOString()
+        startData.connectorId,
+        startData.idTag,
+        startData.meterStart,
+        startData.timestamp
       );
       const startRes = await waitForResponse(ocppClient, startReqId);
       console.log('<= Respuesta StartTransaction:', startRes);
@@ -72,26 +76,17 @@ test.describe.serial('@carga FlujoCompleto', () => {
     if (!txId) {
       throw new Error('🚨 No hay transactionId para enviar MeterValues.');
     }
-    let meterValueCounter = 100;
-    for (let i = 1; i <= 6; i++) {
-      meterValueCounter += Math.floor(Math.random() * 50) + 20; // Valor base que se incrementa aleatoriamente
+    for (const meterValue of testData.meterValues) {
       const meterReqId = ocppClient.sendMeterValues(
         txId,
-        [{
-          timestamp: new Date().toISOString(),
-          sampledValue: [{
-            value: `${meterValueCounter}`,
-            unit: "Wh",
-            measurand: "Energy.Active.Import.Register"
-          }]
-        }]
+        [meterValue]
       );
 
       try {
         const mvResp = await waitForResponse(ocppClient, meterReqId);
-        console.log(`<= Respuesta MeterValues (${i}):`, mvResp);
+        console.log(`<= Respuesta MeterValues:`, mvResp);
       } catch {
-        console.log(`⚠️ No se recibió respuesta para MeterValues (${i}), continuando...`);
+        console.log(`⚠️ No se recibió respuesta para MeterValues, continuando...`);
       }
 
       // Espera entre mediciones (por ejemplo, 5 segundos)
@@ -116,10 +111,11 @@ test.describe.serial('@carga FlujoCompleto', () => {
      * 6. StopTransaction
      */
     console.log('🛑 Enviando StopTransaction...');
+    const stopData = testData.stopTransaction;
     const stopReqId = ocppClient.sendStopTransaction(
       txId,
-      300,
-      new Date().toISOString()
+      stopData.meterStop,
+      stopData.timestamp
     );
     const stopRes = await waitForResponse(ocppClient, stopReqId, 10000);
     console.log('<= Respuesta StopTransaction:', stopRes);

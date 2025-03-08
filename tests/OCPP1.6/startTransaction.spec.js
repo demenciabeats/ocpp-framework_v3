@@ -1,6 +1,9 @@
 import { test } from '../../fixtures/ocppFixture';
 import { waitForResponse } from '../../utils/waitForResponse';
 import stateManager from '../../utils/stateManager';
+import fs from 'fs';
+
+const testData = JSON.parse(fs.readFileSync('./data/testData.json', 'utf-8'));
 
 test.describe.serial('@carga ⚡ Iniciar StartTransaction', () => {
     test('⚡ StartTransaction', async ({ ocppClient }) => {
@@ -12,11 +15,12 @@ test.describe.serial('@carga ⚡ Iniciar StartTransaction', () => {
             throw new Error('🚨 No se puede iniciar la transacción sin Authorize.');
         }
 
+        const startData = testData.startTransaction;
         const uniqueId = ocppClient.sendStartTransaction(
-            Number(process.env.CONNECTOR_ID),
-            process.env.ID_TAG,
-            100,
-            new Date().toISOString()
+            startData.connectorId,
+            startData.idTag,
+            startData.meterStart,
+            startData.timestamp
         );
 
         const response = await waitForResponse(ocppClient, uniqueId);

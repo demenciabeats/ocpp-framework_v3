@@ -2,8 +2,11 @@ import { test, expect } from '@playwright/test';
 import OcppClient from '../../api/ocppClient';
 import { waitForResponse } from '../../utils/waitForResponse';
 import dotenv from 'dotenv';
+import fs from 'fs';
 
 dotenv.config();
+
+const testData = JSON.parse(fs.readFileSync('./data/testData.json', 'utf-8'));
 
 test.describe('Template de Test OCPP', () => {
   let ocppClient;
@@ -14,15 +17,20 @@ test.describe('Template de Test OCPP', () => {
   });
 
   test('Ejemplo de Test con waitForResponse', async () => {
-    const uniqueId = "001";
-    const message = [2, uniqueId, "BootNotification", {
-      chargePointVendor: "Dhemax",
-      chargePointModel: "Model-X"
-    }];
+    const bootData = testData.bootNotification;
+    const uniqueId = ocppClient.sendBootNotification(
+      bootData.vendor,
+      bootData.model,
+      bootData.serialNumber,
+      bootData.chargeBoxSerialNumber,
+      bootData.firmwareVersion,
+      bootData.iccid,
+      bootData.imsi,
+      bootData.meterType,
+      bootData.meterSerialNumber
+    );
 
-    console.log("📤 Enviando BootNotification:", JSON.stringify(message));
-    ocppClient.sendMessage(message);
-
+    console.log("📤 Enviando BootNotification:", JSON.stringify(bootData));
     const response = await waitForResponse(ocppClient, uniqueId);
     console.log("📥 Respuesta recibida:", response);
 

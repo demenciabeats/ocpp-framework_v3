@@ -2,8 +2,11 @@ import { test, expect } from '@playwright/test';
 import OcppClient from '../../api/ocppClient';
 import { waitForResponse } from '../../utils/waitForResponse';
 import dotenv from 'dotenv';
+import fs from 'fs';
 
 dotenv.config();
+
+const testData = JSON.parse(fs.readFileSync('./data/testData.json', 'utf-8'));
 
 test.describe('🔌 Conexión al WebSocket OCPP 1.6 y envío de BootNotification + Heartbeat', () => {
     let ocppClient;
@@ -18,16 +21,17 @@ test.describe('🔌 Conexión al WebSocket OCPP 1.6 y envío de BootNotification
         // 2️⃣ Enviar BootNotification
         console.log("⚡ Enviando BootNotification...");
 
+        const bootData = testData.bootNotification;
         const uniqueId = ocppClient.sendBootNotification(
-            "infypower",
-            "Infi4ever",
-            "SN-12345678",
-            "EV.2S7P04",
-            "3.3.0.10",
-            "8901120000000000000",
-            "123456789012345",
-            "DhemaxMeter",
-            "MTR-001"
+            bootData.vendor,
+            bootData.model,
+            bootData.serialNumber,
+            bootData.chargeBoxSerialNumber,
+            bootData.firmwareVersion,
+            bootData.iccid,
+            bootData.imsi,
+            bootData.meterType,
+            bootData.meterSerialNumber
         );
 
         const bootResponse = await waitForResponse(ocppClient, uniqueId);

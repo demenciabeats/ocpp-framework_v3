@@ -1,6 +1,5 @@
 import { test } from '../../fixtures/ocppFixture';
 import { waitForResponse } from '../../utils/waitForResponse';
-import stateManager from '../../utils/stateManager';
 
 test.describe.serial('@carga 🩺 Enviar Heartbeat', () => {
     test('🩺 Heartbeat', { timeout: 7000 }, async ({ ocppClient }) => {

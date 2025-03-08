@@ -3,7 +3,9 @@ import { waitForResponse } from '../../utils/waitForResponse';
 import { execFileSync } from 'child_process';
 import path from 'path';
 import stateManager from '../../utils/stateManager';
+import fs from 'fs';
 
+const testData = JSON.parse(fs.readFileSync('./data/testData.json', 'utf-8'));
 const scriptPath = path.join(process.cwd(), 'utils', 'analyzeMeterValues.js');
 
 test.describe.serial('@carga 🛑 Finalizar StopTransaction', () => {
@@ -24,7 +26,8 @@ test.describe.serial('@carga 🛑 Finalizar StopTransaction', () => {
 
         // 3. Enviamos StopTransaction con el transactionId real
         console.log('🛑 Enviando StopTransaction...');
-        const uniqueId = ocppClient.sendStopTransaction(transactionId, 300, new Date().toISOString());
+        const stopData = testData.stopTransaction;
+        const uniqueId = ocppClient.sendStopTransaction(transactionId, stopData.meterStop, stopData.timestamp);
 
         const response = await waitForResponse(ocppClient, uniqueId);
         console.log("📥 Respuesta recibida:", response);
