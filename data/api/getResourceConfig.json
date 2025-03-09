@@ -1,5 +1,5 @@
 {
-  "endpoint": "https://fakestoreapi.com/users",
+  "endpoint": "https://67ccf992dd7651e464ed1c4b.mockapi.io/users",
   "method": "GET",
   "headers": {
     "Content-Type": "application/json"

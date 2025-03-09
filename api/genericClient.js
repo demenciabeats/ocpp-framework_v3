@@ -39,7 +39,7 @@ function validateResponse(response, expected = {}, rules = {}) {
           errors.push(`Fallo en la validación en ${rule.jsonPath}: se esperaba ${rule.expected} y se recibió ${value}`);
         }
       }
-      // Otros operadores pueden implementarse aquí.
+      // Puedes implementar otros operadores según requieras.
     });
   }
 
@@ -48,7 +48,11 @@ function validateResponse(response, expected = {}, rules = {}) {
 
 /**
  * Envía una petición genérica de acuerdo con la configuración especificada.
- * La configuración se espera con la siguiente estructura:
+ * Se integra la lógica para:
+ *   - Inyectar el token en el header "Authorization" si "requiresToken" es verdadero.
+ *   - Usar autenticación básica si se proporciona "auth" y no se requiere token.
+ *
+ * La configuración debe tener la siguiente estructura:
  * {
  *   "endpoint": "http://ejemplo.com/api",
  *   "method": "POST",
@@ -66,12 +70,13 @@ function validateResponse(response, expected = {}, rules = {}) {
  *             { "jsonPath": "$.data.value", "operator": "equals", "expected": 123 }
  *         ]
  *   },
- *   "requiresToken": true,  // para indicar que se inyecte el header "Authorization"
- *   "token": "Bearer <token>"  // o se puede obtener de forma global.
+ *   "requiresToken": true,  // Indica que se inyecte el header "Authorization"
+ *   "token": "Bearer <token>"  // O se obtiene desde una variable de entorno
  * }
+ *
  * @param {Object} config - Objeto de configuración en JSON.
  * @returns {Promise<Object>} Objeto con la respuesta de axios y los resultados de la validación.
-*/
+ */
 export async function sendGenericRequest(config) {
   if (!config.endpoint) throw new Error("La configuración debe incluir 'endpoint'.");
   if (!config.method) throw new Error("La configuración debe incluir 'method'.");
@@ -79,15 +84,9 @@ export async function sendGenericRequest(config) {
   // Construir headers; si ya existen, se preservan
   const headers = config.headers || {};
 
-  // Si la configuración requiere token y no se encuentra en headers,
-  // revisamos si se entrega la propiedad token
+  // Si se requiere token, inyectarlo en el header "Authorization"
   if (config.requiresToken) {
-    if (config.token) {
-      headers["Authorization"] = config.token;
-    } else {
-      // También podrías obtener el token desde una variable de entorno u otro servicio
-      headers["Authorization"] = `Bearer ${process.env.API_TOKEN || ''}`;
-    }
+    headers["Authorization"] = config.token ? config.token : `Bearer ${process.env.API_TOKEN || ''}`;
   }
 
   const requestOptions = {
@@ -96,10 +95,10 @@ export async function sendGenericRequest(config) {
     headers,
     params: config.params || {},
     data: config.body || {},
-    timeout: config.timeout || 10000 // valor por defecto de 10 segundos
+    timeout: config.timeout || 10000 // Valor por defecto de 10 segundos
   };
 
-  // Si se proporciona autenticación básica y no se sobreescribió el token, agrégala.
+  // Agregar autenticación básica si se proporciona y no se requiere token
   if (config.auth && !config.requiresToken) {
     requestOptions.auth = config.auth;
   }
@@ -119,8 +118,5 @@ export async function sendGenericRequest(config) {
   const rules = config.validationRules || {};
   const validationResult = validateResponse(response, expected, rules);
 
-  return {
-    response,
-    validation: validationResult
-  };
+  return { response, validation: validationResult };
 }

@@ -1,13 +1,20 @@
 {
-  "endpoint": "https://fakestoreapi.com/users",
-  "method": "GET",
+  "endpoint": "https://example.com/api/recurso",
+  "method": "POST",
   "headers": {
     "Content-Type": "application/json"
   },
   "params": {
     "q": "test"
   },
-  "body": null,
+  "auth": {
+    "username": "user",
+    "password": "pass"
+  },
+  "body": {                                         
+    "campo1": "valor1",
+    "campo2": 42
+  },
   "timeout": 10000,
   "expectedResponse": {
     "status": 200,
@@ -16,6 +23,10 @@
     }
   },
   "validationRules": {
-    "rules": []
-  }
+    "rules": [
+      { "jsonPath": "$.data.value", "operator": "equals", "expected": 123 }
+    ]
+  },
+  "requiresToken": true,
+  "token": "Bearer abc123-token-ejemplo"
 }

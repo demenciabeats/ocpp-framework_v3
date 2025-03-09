@@ -1,0 +1,27 @@
+{
+  "endpoint": "https://fakestoreapi.com/users",
+  "method": "POST",
+  "headers": {
+    "Content-Type": "application/json"
+  },
+  "params": {},
+  "body": {
+    "email": "newuser@example.com",
+    "username": "newuser",
+    "password": "password123"
+  },
+  "timeout": 10000,
+  "expectedResponse": {
+    "status": 200
+  },
+  "validationRules": {
+    "rules": [
+      {
+        "jsonPath": "$.email",
+        "operator": "equals",
+        "expected": "newuser@example.com"
+      }
+    ]
+  },
+  "requiresToken": false
+}
