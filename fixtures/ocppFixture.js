@@ -2,17 +2,35 @@ import { test as base } from '@playwright/test';
 import OcppClient from '../api/ocppClient';
 import dotenv from 'dotenv';
 import stateManager from '../utils/stateManager';
+import path from 'path';
+import fs from 'fs';
 
+// Cargar variables de entorno
 dotenv.config();
+
+// Verificar si existe un archivo .env.local y también cargarlo (tiene precedencia)
+const envLocalPath = path.join(process.cwd(), '.env.local');
+if (fs.existsSync(envLocalPath)) {
+    dotenv.config({ path: envLocalPath });
+}
 
 export const test = base.extend({
     ocppClient: async ({}, use) => {
-    
+        // Reiniciar estado para cada test
         stateManager.resetState();
 
-        const client = new OcppClient(process.env.WS_URL, process.env.CHARGE_POINT_ID);
-        await client.connect();
-        await use(client);
-        client.close();
+        // Obtener URL y ID del punto de carga desde variables de entorno o usar valores predeterminados
+        const wsUrl = process.env.WS_URL;
+        const chargePointId = process.env.CHARGE_POINT_ID;
+        
+        console.log(`🔌 Conectando a ${wsUrl} como punto de carga ${chargePointId}`);
+        
+        const client = new OcppClient(wsUrl, chargePointId);
+        try {
+            await client.connect();
+            await use(client);
+        } finally {
+            client.close();
+        }
     }
 });

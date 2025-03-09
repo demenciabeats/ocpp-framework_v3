@@ -110,3 +110,81 @@ export function sendStatusNotification(ocppClient, statusData) {
     ocppClient.sendMessage(message);
     return uniqueId;
 }
+
+export function sendChangeAvailability(ocppClient, connectorId, type) {
+    const uniqueId = generateUniqueId();
+    const message = [
+        2,
+        uniqueId,
+        "ChangeAvailability",
+        {
+            connectorId: connectorId,
+            type: type // "Operative" o "Inoperative"
+        }
+    ];
+    ocppClient.sendMessage(message);
+    return uniqueId;
+}
+
+export function sendFirmwareStatusNotification(ocppClient, data) {
+    const uniqueId = generateUniqueId();
+    const message = [
+        2,
+        uniqueId,
+        "FirmwareStatusNotification",
+        {
+            firmwareVersion: data.firmwareVersion
+        }
+    ];
+    ocppClient.sendMessage(message);
+    return uniqueId;
+}
+
+export function sendGetDiagnostics(ocppClient, data) {
+    const uniqueId = generateUniqueId();
+    const message = [
+        2,
+        uniqueId,
+        "GetDiagnostics",
+        {
+            location: data.location,
+            retries: data.retries,
+            retryInterval: data.retryInterval,
+            startTime: data.startTime,
+            stopTime: data.stopTime
+        }
+    ];
+    ocppClient.sendMessage(message);
+    return uniqueId;
+}
+
+export function sendDiagnosticsStatusNotification(ocppClient, data) {
+    const uniqueId = generateUniqueId();
+    const message = [
+        2,
+        uniqueId,
+        "DiagnosticsStatusNotification",
+        {
+            status: data.status
+        }
+    ];
+    ocppClient.sendMessage(message);
+    return uniqueId;
+}
+
+export function sendUpdateFirmware(ocppClient, data) {
+    const uniqueId = generateUniqueId();
+    const message = [
+        2,
+        uniqueId,
+        "UpdateFirmware",
+        {
+            location: data.location,
+            retries: data.retries,
+            retrieveDate: data.retrieveDate,
+            retryInterval: data.retryInterval
+        }
+    ];
+    ocppClient.sendMessage(message);
+    return uniqueId;
+}

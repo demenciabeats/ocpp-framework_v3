@@ -5,6 +5,14 @@ import { sendGenericRequest } from './genericClient';
 
 class OcppClient {
     constructor(wsUrl, chargePointId) {
+        // Validar parámetros de entrada
+        if (!wsUrl) {
+            throw new Error('El parámetro wsUrl es requerido. Verifica tu archivo .env');
+        }
+        if (!chargePointId) {
+            throw new Error('El parámetro chargePointId es requerido. Verifica tu archivo .env');
+        }
+        
         this.wsUrl = wsUrl;
         this.chargePointId = chargePointId;
         this.socket = null;
@@ -12,26 +20,34 @@ class OcppClient {
 
     async connect() {
         return new Promise((resolve, reject) => {
-            this.socket = new WebSocket(`${this.wsUrl}/${this.chargePointId}`, ["ocpp1.6"], {
-                headers: {
-                    "Sec-WebSocket-Protocol": "ocpp1.6",
-                    "User-Agent": "OCPP-Test-Client"
-                }
-            });
+            try {
+                const fullUrl = `${this.wsUrl}/${this.chargePointId}`;
+                console.log(`🔗 Intentando conectar a: ${fullUrl}`);
+                
+                this.socket = new WebSocket(fullUrl, ["ocpp1.6"], {
+                    headers: {
+                        "Sec-WebSocket-Protocol": "ocpp1.6",
+                        "User-Agent": "OCPP-Test-Client"
+                    }
+                });
 
-            this.socket.on('open', () => {
-                console.log('✅ Conectado a WebSocket OCPP con subprotocolo ocpp1.6');
-                resolve();
-            });
+                this.socket.on('open', () => {
+                    console.log('✅ Conectado a WebSocket OCPP con subprotocolo ocpp1.6');
+                    resolve();
+                });
 
-            this.socket.on('message', (data) => {
-                handleMessage(data);
-            });
+                this.socket.on('message', (data) => {
+                    handleMessage(data);
+                });
 
-            this.socket.on('error', (err) => {
-                console.error('❌ Error en WebSocket:', err);
-                reject(err);
-            });
+                this.socket.on('error', (err) => {
+                    console.error('❌ Error en WebSocket:', err);
+                    reject(err);
+                });
+            } catch (error) {
+                console.error('❌ Error al crear la conexión WebSocket:', error);
+                reject(error);
+            }
         });
     }
 
@@ -225,6 +241,32 @@ class OcppClient {
      */
     async sendGenericAPIRequest(config) {
         return sendGenericRequest(config);
+    }
+
+    sendChangeAvailability(connectorId, type) {
+        const uniqueId = generateUniqueId();
+        const message = [
+            2,
+            uniqueId,
+            "ChangeAvailability",
+            {
+                connectorId,
+                type // "Operative" o "Inoperative"
+            }
+        ];
+        this.sendMessage(message);
+        return uniqueId;
+    }
+
+    // Nuevo método para procesar la orden ChangeAvailability recibida del CSMS
+    handleChangeAvailability(command) {
+        console.log('🔄 Procesando ChangeAvailability recibido:', command);
+        // Si el comando indica "Unavailable", se responde enviando StatusNotification con "Unavailable"
+        if (command.type === "Unavailable") {
+            return this.sendStatusNotification(command.connectorId, "Unavailable", "NoError");
+        }
+        // Se podría manejar otros casos según la lógica
+        return null;
     }
 }
 

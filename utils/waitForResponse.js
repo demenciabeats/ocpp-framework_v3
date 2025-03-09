@@ -8,8 +8,9 @@ export async function waitForResponse(ocppClient, requestId, timeoutMs = 8000) {
         }
 
         const data = JSON.parse(raw);
-        // data[0] = 3 => Respuesta, data[1] = requestId, data[2] = payload
-        if (data[0] === 3 && data[1] === requestId) {
+        console.log('📥 Mensaje recibido:', data);
+        // Comparamos los requestId como string para evitar problemas de tipado
+        if (data[0] === 3 && String(data[1]) === String(requestId)) {
           ocppClient.socket.off('message', onMessage);
           resolve(data[2]);
         }

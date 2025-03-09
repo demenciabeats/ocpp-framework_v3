@@ -5,7 +5,8 @@ import {
     sendStartTransaction,
     sendStopTransaction,
     sendHeartbeat,
-    sendStatusNotification
+    sendStatusNotification,
+    sendChangeAvailability
 } from '../api/ocppMessages';
 import { generateAndSendMeterValues } from '../api/utils';
 
@@ -37,6 +38,12 @@ export async function heartbeat(ocppClient) {
 export async function statusNotification(ocppClient, statusData) {
     const statusReqId = sendStatusNotification(ocppClient, statusData);
     return await waitForResponse(ocppClient, statusReqId);
+}
+
+export async function changeAvailability(ocppClient, connectorId, type) {
+    const changeAvailReqId = sendChangeAvailability(ocppClient, connectorId, type);
+    // Aumentamos el timeout a 15000ms (15 segundos) para esperar la respuesta del CSMS
+    return await waitForResponse(ocppClient, changeAvailReqId, 30000);
 }
 
 export async function simulateCharging(ocppClient, transactionId, intervalSeconds, durationSeconds, connector) {
