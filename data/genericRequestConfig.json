@@ -1,5 +1,5 @@
 {
-  "endpoint": "https://example.com/api/recurso",
+  "endpoint": "https://cms.qa.dhemax.link/api/auth/login",
   "method": "POST",
   "headers": {
     "Content-Type": "application/json"
@@ -8,12 +8,12 @@
     "q": "test"
   },
   "auth": {
-    "username": "user",
-    "password": "pass"
+    "username": "",
+    "password": ""
   },
   "body": {                                         
-    "campo1": "valor1",
-    "campo2": 42
+     "email": "fprovoste@dhemax.com",
+    "password": "dhemax.2024q"
   },
   "timeout": 10000,
   "expectedResponse": {
