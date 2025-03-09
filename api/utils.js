@@ -12,6 +12,12 @@ export function generateUniqueId() {
     return uuidv4();
 }
 
+let stopRequested = false;
+
+export function stopMeterValues() {
+    stopRequested = true;
+}
+
 export async function generateAndSendMeterValues(ocppClient, transactionId) {
     const { maxPower, batteryCapacity, initialSoc, connectorId } = testData.connector;
     let { intervalSeconds, durationSeconds } = testData.meterValuesConfig; // Cambiar a let para poder modificar
@@ -26,60 +32,65 @@ export async function generateAndSendMeterValues(ocppClient, transactionId) {
         fs.writeFileSync(filePath, JSON.stringify([], null, 2));
     }
 
-    const intervalId = setInterval(() => {
-        if (durationSeconds <= 0) {
-            clearInterval(intervalId);
-            // Guardar los MeterValues en el archivo JSON
-            fs.writeFileSync(filePath, JSON.stringify(meterValues, null, 2));
-            return;
-        }
+    // Devuelve una promesa para esperar al fin del intervalo
+    return new Promise((resolve) => {
+        const intervalId = setInterval(() => {
+            // Detener si se pidió StopTransaction
+            if (stopRequested || durationSeconds <= 0) {
+                clearInterval(intervalId);
+                // Guardar los MeterValues en el archivo JSON
+                fs.writeFileSync(filePath, JSON.stringify(meterValues, null, 2));
+                resolve(); // Finaliza la promesa
+                return;
+            }
 
-        const power = maxPower * 1000; // Convertir kW a W
-        const energyDelivered = (power * intervalSeconds) / 3600; // Energía en Wh
-        meterValueCounter += energyDelivered;
-        currentSoc += (energyDelivered / (batteryCapacity * 1000)) * 100; // Actualizar SOC
+            const power = maxPower * 1000; // Convertir kW a W
+            const energyDelivered = (power * intervalSeconds) / 3600; // Energía en Wh
+            meterValueCounter += energyDelivered;
+            currentSoc += (energyDelivered / (batteryCapacity * 1000)) * 100; // Actualizar SOC
 
-        const meterValue = {
-            timestamp: new Date().toISOString(),
-            sampledValue: [
-                {
-                    value: `${currentSoc.toFixed(2)}`,
-                    unit: "Percent",
-                    context: "Sample.Periodic",
-                    format: "Raw",
-                    measurand: "SoC",
-                    location: "EVSE"
-                },
-                {
-                    value: `${power.toFixed(2)}`,
-                    unit: "W",
-                    context: "Sample.Periodic",
-                    format: "Raw",
-                    measurand: "Power.Active.Import",
-                    location: "Outlet"
-                },
-                {
-                    value: `${energyDelivered.toFixed(2)}`,
-                    unit: "A",
-                    context: "Sample.Periodic",
-                    format: "Raw",
-                    measurand: "Current.Import",
-                    location: "Outlet"
-                },
-                {
-                    value: `${meterValueCounter.toFixed(2)}`,
-                    unit: "Wh",
-                    context: "Sample.Periodic",
-                    format: "Raw",
-                    measurand: "Energy.Active.Import.Register",
-                    location: "Outlet"
-                }
-            ]
-        };
+            const meterValue = {
+                timestamp: new Date().toISOString(),
+                sampledValue: [
+                    {
+                        value: `${currentSoc.toFixed(2)}`,
+                        unit: "Percent",
+                        context: "Sample.Periodic",
+                        format: "Raw",
+                        measurand: "SoC",
+                        location: "EVSE"
+                    },
+                    {
+                        value: `${power.toFixed(2)}`,
+                        unit: "W",
+                        context: "Sample.Periodic",
+                        format: "Raw",
+                        measurand: "Power.Active.Import",
+                        location: "Outlet"
+                    },
+                    {
+                        value: `${energyDelivered.toFixed(2)}`,
+                        unit: "A",
+                        context: "Sample.Periodic",
+                        format: "Raw",
+                        measurand: "Current.Import",
+                        location: "Outlet"
+                    },
+                    {
+                        value: `${meterValueCounter.toFixed(2)}`,
+                        unit: "Wh",
+                        context: "Sample.Periodic",
+                        format: "Raw",
+                        measurand: "Energy.Active.Import.Register",
+                        location: "Outlet"
+                    }
+                ]
+            };
 
-        meterValues.push(meterValue);
-        const uniqueId = generateUniqueId();
-        sendMeterValues(ocppClient, connectorId, transactionId, [meterValue], uniqueId);
-        durationSeconds -= intervalSeconds;
-    }, intervalSeconds * 1000);
+            meterValues.push(meterValue);
+            const uniqueId = generateUniqueId();
+            sendMeterValues(ocppClient, connectorId, transactionId, [meterValue], uniqueId);
+            durationSeconds -= intervalSeconds;
+        }, intervalSeconds * 1000);
+    });
 }

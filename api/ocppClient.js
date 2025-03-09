@@ -1,6 +1,7 @@
 import WebSocket from 'ws';
 import { handleMessage } from './messageHandler';
 import { generateUniqueId } from './utils';
+import { sendGenericRequest } from './genericClient';
 
 class OcppClient {
     constructor(wsUrl, chargePointId) {
@@ -215,6 +216,15 @@ class OcppClient {
             this.sendMeterValues(connector.connectorId, transactionId, [meterValue]);
             durationSeconds -= intervalSeconds;
         }, intervalSeconds * 1000);
+    }
+
+    /**
+     * Envía una petición genérica usando la configuración especificada.
+     * @param {Object} config - Configuración de la petición definida en formato JSON.
+     * @returns {Promise<Object>} Resultado de la petición y validación.
+     */
+    async sendGenericAPIRequest(config) {
+        return sendGenericRequest(config);
     }
 }
 

@@ -1,0 +1,21 @@
+{
+  "endpoint": "https://fakestoreapi.com/users",
+  "method": "GET",
+  "headers": {
+    "Content-Type": "application/json"
+  },
+  "params": {
+    "q": "test"
+  },
+  "body": null,
+  "timeout": 10000,
+  "expectedResponse": {
+    "status": 200,
+    "body": {
+      "result": "ok"
+    }
+  },
+  "validationRules": {
+    "rules": []
+  }
+}

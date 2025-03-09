@@ -1,0 +1,40 @@
+{
+  "endpoint": "http://ejemplo.com/api",
+  "method": "POST",
+  "headers": {
+    "Content-Type": "application/json",
+    "Custom-Header": "valorPersonalizado"
+  },
+  "params": {
+    "q": "test"
+  },
+  "requiresToken": true,
+  "token": "Bearer abc123-token-ejemplo",
+  "body": {
+    "data": {
+      "value": 123,
+      "detalle": "ejemplo de payload"
+    }
+  },
+  "timeout": 10000,
+  "expectedResponse": {
+    "status": 200,
+    "body": {
+      "result": "ok"
+    }
+  },
+  "validationRules": {
+    "rules": [
+      {
+        "jsonPath": "$.data.value",
+        "operator": "equals",
+        "expected": 123
+      },
+      {
+        "jsonPath": "$.result",
+        "operator": "equals",
+        "expected": "ok"
+      }
+    ]
+  }
+}

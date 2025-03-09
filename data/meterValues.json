@@ -1,1 +1,335 @@
-[]
+[
+  {
+    "timestamp": "2025-03-09T01:05:58.615Z",
+    "sampledValue": [
+      {
+        "value": "20.12",
+        "unit": "Percent",
+        "context": "Sample.Periodic",
+        "format": "Raw",
+        "measurand": "SoC",
+        "location": "EVSE"
+      },
+      {
+        "value": "22000.00",
+        "unit": "W",
+        "context": "Sample.Periodic",
+        "format": "Raw",
+        "measurand": "Power.Active.Import",
+        "location": "Outlet"
+      },
+      {
+        "value": "61.11",
+        "unit": "A",
+        "context": "Sample.Periodic",
+        "format": "Raw",
+        "measurand": "Current.Import",
+        "location": "Outlet"
+      },
+      {
+        "value": "61.11",
+        "unit": "Wh",
+        "context": "Sample.Periodic",
+        "format": "Raw",
+        "measurand": "Energy.Active.Import.Register",
+        "location": "Outlet"
+      }
+    ]
+  },
+  {
+    "timestamp": "2025-03-09T01:06:08.616Z",
+    "sampledValue": [
+      {
+        "value": "20.24",
+        "unit": "Percent",
+        "context": "Sample.Periodic",
+        "format": "Raw",
+        "measurand": "SoC",
+        "location": "EVSE"
+      },
+      {
+        "value": "22000.00",
+        "unit": "W",
+        "context": "Sample.Periodic",
+        "format": "Raw",
+        "measurand": "Power.Active.Import",
+        "location": "Outlet"
+      },
+      {
+        "value": "61.11",
+        "unit": "A",
+        "context": "Sample.Periodic",
+        "format": "Raw",
+        "measurand": "Current.Import",
+        "location": "Outlet"
+      },
+      {
+        "value": "122.22",
+        "unit": "Wh",
+        "context": "Sample.Periodic",
+        "format": "Raw",
+        "measurand": "Energy.Active.Import.Register",
+        "location": "Outlet"
+      }
+    ]
+  },
+  {
+    "timestamp": "2025-03-09T01:06:18.617Z",
+    "sampledValue": [
+      {
+        "value": "20.37",
+        "unit": "Percent",
+        "context": "Sample.Periodic",
+        "format": "Raw",
+        "measurand": "SoC",
+        "location": "EVSE"
+      },
+      {
+        "value": "22000.00",
+        "unit": "W",
+        "context": "Sample.Periodic",
+        "format": "Raw",
+        "measurand": "Power.Active.Import",
+        "location": "Outlet"
+      },
+      {
+        "value": "61.11",
+        "unit": "A",
+        "context": "Sample.Periodic",
+        "format": "Raw",
+        "measurand": "Current.Import",
+        "location": "Outlet"
+      },
+      {
+        "value": "183.33",
+        "unit": "Wh",
+        "context": "Sample.Periodic",
+        "format": "Raw",
+        "measurand": "Energy.Active.Import.Register",
+        "location": "Outlet"
+      }
+    ]
+  },
+  {
+    "timestamp": "2025-03-09T01:06:28.617Z",
+    "sampledValue": [
+      {
+        "value": "20.49",
+        "unit": "Percent",
+        "context": "Sample.Periodic",
+        "format": "Raw",
+        "measurand": "SoC",
+        "location": "EVSE"
+      },
+      {
+        "value": "22000.00",
+        "unit": "W",
+        "context": "Sample.Periodic",
+        "format": "Raw",
+        "measurand": "Power.Active.Import",
+        "location": "Outlet"
+      },
+      {
+        "value": "61.11",
+        "unit": "A",
+        "context": "Sample.Periodic",
+        "format": "Raw",
+        "measurand": "Current.Import",
+        "location": "Outlet"
+      },
+      {
+        "value": "244.44",
+        "unit": "Wh",
+        "context": "Sample.Periodic",
+        "format": "Raw",
+        "measurand": "Energy.Active.Import.Register",
+        "location": "Outlet"
+      }
+    ]
+  },
+  {
+    "timestamp": "2025-03-09T01:06:38.617Z",
+    "sampledValue": [
+      {
+        "value": "20.61",
+        "unit": "Percent",
+        "context": "Sample.Periodic",
+        "format": "Raw",
+        "measurand": "SoC",
+        "location": "EVSE"
+      },
+      {
+        "value": "22000.00",
+        "unit": "W",
+        "context": "Sample.Periodic",
+        "format": "Raw",
+        "measurand": "Power.Active.Import",
+        "location": "Outlet"
+      },
+      {
+        "value": "61.11",
+        "unit": "A",
+        "context": "Sample.Periodic",
+        "format": "Raw",
+        "measurand": "Current.Import",
+        "location": "Outlet"
+      },
+      {
+        "value": "305.56",
+        "unit": "Wh",
+        "context": "Sample.Periodic",
+        "format": "Raw",
+        "measurand": "Energy.Active.Import.Register",
+        "location": "Outlet"
+      }
+    ]
+  },
+  {
+    "timestamp": "2025-03-09T01:06:48.617Z",
+    "sampledValue": [
+      {
+        "value": "20.73",
+        "unit": "Percent",
+        "context": "Sample.Periodic",
+        "format": "Raw",
+        "measurand": "SoC",
+        "location": "EVSE"
+      },
+      {
+        "value": "22000.00",
+        "unit": "W",
+        "context": "Sample.Periodic",
+        "format": "Raw",
+        "measurand": "Power.Active.Import",
+        "location": "Outlet"
+      },
+      {
+        "value": "61.11",
+        "unit": "A",
+        "context": "Sample.Periodic",
+        "format": "Raw",
+        "measurand": "Current.Import",
+        "location": "Outlet"
+      },
+      {
+        "value": "366.67",
+        "unit": "Wh",
+        "context": "Sample.Periodic",
+        "format": "Raw",
+        "measurand": "Energy.Active.Import.Register",
+        "location": "Outlet"
+      }
+    ]
+  },
+  {
+    "timestamp": "2025-03-09T01:06:58.618Z",
+    "sampledValue": [
+      {
+        "value": "20.86",
+        "unit": "Percent",
+        "context": "Sample.Periodic",
+        "format": "Raw",
+        "measurand": "SoC",
+        "location": "EVSE"
+      },
+      {
+        "value": "22000.00",
+        "unit": "W",
+        "context": "Sample.Periodic",
+        "format": "Raw",
+        "measurand": "Power.Active.Import",
+        "location": "Outlet"
+      },
+      {
+        "value": "61.11",
+        "unit": "A",
+        "context": "Sample.Periodic",
+        "format": "Raw",
+        "measurand": "Current.Import",
+        "location": "Outlet"
+      },
+      {
+        "value": "427.78",
+        "unit": "Wh",
+        "context": "Sample.Periodic",
+        "format": "Raw",
+        "measurand": "Energy.Active.Import.Register",
+        "location": "Outlet"
+      }
+    ]
+  },
+  {
+    "timestamp": "2025-03-09T01:07:08.617Z",
+    "sampledValue": [
+      {
+        "value": "20.98",
+        "unit": "Percent",
+        "context": "Sample.Periodic",
+        "format": "Raw",
+        "measurand": "SoC",
+        "location": "EVSE"
+      },
+      {
+        "value": "22000.00",
+        "unit": "W",
+        "context": "Sample.Periodic",
+        "format": "Raw",
+        "measurand": "Power.Active.Import",
+        "location": "Outlet"
+      },
+      {
+        "value": "61.11",
+        "unit": "A",
+        "context": "Sample.Periodic",
+        "format": "Raw",
+        "measurand": "Current.Import",
+        "location": "Outlet"
+      },
+      {
+        "value": "488.89",
+        "unit": "Wh",
+        "context": "Sample.Periodic",
+        "format": "Raw",
+        "measurand": "Energy.Active.Import.Register",
+        "location": "Outlet"
+      }
+    ]
+  },
+  {
+    "timestamp": "2025-03-09T01:07:18.618Z",
+    "sampledValue": [
+      {
+        "value": "21.10",
+        "unit": "Percent",
+        "context": "Sample.Periodic",
+        "format": "Raw",
+        "measurand": "SoC",
+        "location": "EVSE"
+      },
+      {
+        "value": "22000.00",
+        "unit": "W",
+        "context": "Sample.Periodic",
+        "format": "Raw",
+        "measurand": "Power.Active.Import",
+        "location": "Outlet"
+      },
+      {
+        "value": "61.11",
+        "unit": "A",
+        "context": "Sample.Periodic",
+        "format": "Raw",
+        "measurand": "Current.Import",
+        "location": "Outlet"
+      },
+      {
+        "value": "550.00",
+        "unit": "Wh",
+        "context": "Sample.Periodic",
+        "format": "Raw",
+        "measurand": "Energy.Active.Import.Register",
+        "location": "Outlet"
+      }
+    ]
+  }
+]

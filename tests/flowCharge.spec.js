@@ -1,6 +1,7 @@
 import { test } from '../fixtures/ocppFixture';
 import stateManager from '../utils/stateManager';
 import testData from '../data/testData';
+import { stopMeterValues } from '../api/utils';
 import {
     bootNotification,
     authorize,
@@ -10,7 +11,6 @@ import {
     statusNotification,
     simulateCharging
 } from '../utils/testHelpers';
-import { execFileSync } from 'child_process';
 import path from 'path';
 
 const scriptPath = path.join(process.cwd(), 'utils', 'analyzeMeterValues.js');
@@ -112,8 +112,9 @@ test.describe.serial('@carga FlujoCompleto', () => {
         });
         console.log('<= Respuesta StopTransaction:', stopRes);
 
-        console.log('📊 Ejecutando análisis de MeterValues...');
-        execFileSync('node', [scriptPath], { stdio: 'inherit' });
+        // Indicarle a generateAndSendMeterValues que detenga el loop
+        stopMeterValues();
+
         resolve();
       }, 90000); // 1:30 minutos
     });
