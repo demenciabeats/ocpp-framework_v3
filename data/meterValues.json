@@ -1,6 +1,6 @@
 [
   {
-    "timestamp": "2025-03-09T01:05:58.615Z",
+    "timestamp": "2025-03-09T16:54:51.957Z",
     "sampledValue": [
       {
         "value": "20.12",
@@ -37,7 +37,7 @@
     ]
   },
   {
-    "timestamp": "2025-03-09T01:06:08.616Z",
+    "timestamp": "2025-03-09T16:55:01.957Z",
     "sampledValue": [
       {
         "value": "20.24",
@@ -74,7 +74,7 @@
     ]
   },
   {
-    "timestamp": "2025-03-09T01:06:18.617Z",
+    "timestamp": "2025-03-09T16:55:11.957Z",
     "sampledValue": [
       {
         "value": "20.37",
@@ -111,7 +111,7 @@
     ]
   },
   {
-    "timestamp": "2025-03-09T01:06:28.617Z",
+    "timestamp": "2025-03-09T16:55:21.958Z",
     "sampledValue": [
       {
         "value": "20.49",
@@ -148,7 +148,7 @@
     ]
   },
   {
-    "timestamp": "2025-03-09T01:06:38.617Z",
+    "timestamp": "2025-03-09T16:55:31.957Z",
     "sampledValue": [
       {
         "value": "20.61",
@@ -185,7 +185,7 @@
     ]
   },
   {
-    "timestamp": "2025-03-09T01:06:48.617Z",
+    "timestamp": "2025-03-09T16:55:41.958Z",
     "sampledValue": [
       {
         "value": "20.73",
@@ -222,7 +222,7 @@
     ]
   },
   {
-    "timestamp": "2025-03-09T01:06:58.618Z",
+    "timestamp": "2025-03-09T16:55:51.958Z",
     "sampledValue": [
       {
         "value": "20.86",
@@ -259,7 +259,7 @@
     ]
   },
   {
-    "timestamp": "2025-03-09T01:07:08.617Z",
+    "timestamp": "2025-03-09T16:56:01.960Z",
     "sampledValue": [
       {
         "value": "20.98",
@@ -296,7 +296,7 @@
     ]
   },
   {
-    "timestamp": "2025-03-09T01:07:18.618Z",
+    "timestamp": "2025-03-09T16:56:11.960Z",
     "sampledValue": [
       {
         "value": "21.10",
@@ -324,6 +324,117 @@
       },
       {
         "value": "550.00",
+        "unit": "Wh",
+        "context": "Sample.Periodic",
+        "format": "Raw",
+        "measurand": "Energy.Active.Import.Register",
+        "location": "Outlet"
+      }
+    ]
+  },
+  {
+    "timestamp": "2025-03-09T16:56:21.960Z",
+    "sampledValue": [
+      {
+        "value": "21.22",
+        "unit": "Percent",
+        "context": "Sample.Periodic",
+        "format": "Raw",
+        "measurand": "SoC",
+        "location": "EVSE"
+      },
+      {
+        "value": "22000.00",
+        "unit": "W",
+        "context": "Sample.Periodic",
+        "format": "Raw",
+        "measurand": "Power.Active.Import",
+        "location": "Outlet"
+      },
+      {
+        "value": "61.11",
+        "unit": "A",
+        "context": "Sample.Periodic",
+        "format": "Raw",
+        "measurand": "Current.Import",
+        "location": "Outlet"
+      },
+      {
+        "value": "611.11",
+        "unit": "Wh",
+        "context": "Sample.Periodic",
+        "format": "Raw",
+        "measurand": "Energy.Active.Import.Register",
+        "location": "Outlet"
+      }
+    ]
+  },
+  {
+    "timestamp": "2025-03-09T16:56:31.962Z",
+    "sampledValue": [
+      {
+        "value": "21.34",
+        "unit": "Percent",
+        "context": "Sample.Periodic",
+        "format": "Raw",
+        "measurand": "SoC",
+        "location": "EVSE"
+      },
+      {
+        "value": "22000.00",
+        "unit": "W",
+        "context": "Sample.Periodic",
+        "format": "Raw",
+        "measurand": "Power.Active.Import",
+        "location": "Outlet"
+      },
+      {
+        "value": "61.11",
+        "unit": "A",
+        "context": "Sample.Periodic",
+        "format": "Raw",
+        "measurand": "Current.Import",
+        "location": "Outlet"
+      },
+      {
+        "value": "672.22",
+        "unit": "Wh",
+        "context": "Sample.Periodic",
+        "format": "Raw",
+        "measurand": "Energy.Active.Import.Register",
+        "location": "Outlet"
+      }
+    ]
+  },
+  {
+    "timestamp": "2025-03-09T16:56:41.962Z",
+    "sampledValue": [
+      {
+        "value": "21.47",
+        "unit": "Percent",
+        "context": "Sample.Periodic",
+        "format": "Raw",
+        "measurand": "SoC",
+        "location": "EVSE"
+      },
+      {
+        "value": "22000.00",
+        "unit": "W",
+        "context": "Sample.Periodic",
+        "format": "Raw",
+        "measurand": "Power.Active.Import",
+        "location": "Outlet"
+      },
+      {
+        "value": "61.11",
+        "unit": "A",
+        "context": "Sample.Periodic",
+        "format": "Raw",
+        "measurand": "Current.Import",
+        "location": "Outlet"
+      },
+      {
+        "value": "733.33",
         "unit": "Wh",
         "context": "Sample.Periodic",
         "format": "Raw",
