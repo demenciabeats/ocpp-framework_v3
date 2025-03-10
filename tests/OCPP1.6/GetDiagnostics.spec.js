@@ -17,6 +17,9 @@ test('GetDiagnostics: enviar y recibir respuesta', async () => {
            ocppClient._handler && ocppClient._handler(JSON.stringify(response));
          }, 100);
       }
+    },
+    sendMessage: (msg) => { 
+      ocppClient.socket.send(msg);
     }
   };
 

@@ -34,15 +34,22 @@ test.describe.serial('@carga StopTransaction', () => {
       throw new Error('🚨 No hay transactionId para enviar StopTransaction.');
     }
 
-    // Enviar StopTransaction después de 1:30 minutos de carga
-    setTimeout(async () => {
-      console.log('🛑 Enviando StopTransaction...');
-      const stopRes = await stopTransaction(ocppClient, {
-        transactionId: txId,
-        meterStop: testData.stopTransaction.meterStop,
-        timestamp: testData.stopTransaction.timestamp
-      });
-      console.log('<= Respuesta StopTransaction:', stopRes);
-    }, 90000); // 1:30 minutos
+    // Envolver el envío de StopTransaction en una promesa para esperar su respuesta
+    await new Promise((resolve, reject) => {
+      setTimeout(async () => {
+        try {
+          console.log('🛑 Enviando StopTransaction...');
+          const stopRes = await stopTransaction(ocppClient, {
+            transactionId: txId,
+            meterStop: testData.stopTransaction.meterStop,
+            timestamp: testData.stopTransaction.timestamp
+          });
+          console.log('<= Respuesta StopTransaction:', stopRes);
+          resolve(stopRes);
+        } catch (error) {
+          reject(error);
+        }
+      }, 10000); // 10 segundos para el test (ajustable)
+    });
   });
 });

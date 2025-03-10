@@ -22,7 +22,7 @@ class StateManager {
             if (fs.existsSync(this.filePath)) {
                 const savedState = JSON.parse(fs.readFileSync(this.filePath, 'utf-8'));
                 this.state = { ...this.state, ...savedState };
-                console.log('📝 Estado cargado:', this.state);
+                console.log('📝 Estado interno de test cargado:', this.state);
             } else {
                 // Si no existe, crear archivo con estado inicial
                 fs.writeFileSync(this.filePath, JSON.stringify(this.state, null, 2));
@@ -37,7 +37,7 @@ class StateManager {
         try {
             this.state = { ...this.state, ...newState };
             fs.writeFileSync(this.filePath, JSON.stringify(this.state, null, 2));
-            console.log('💾 Estado guardado:', this.state);
+            console.log('💾 Estado interno de test  guardado:', this.state);
         } catch (error) {
             console.error('❌ Error al guardar el estado:', error);
         }
@@ -54,7 +54,7 @@ class StateManager {
             }
             
             fs.writeFileSync(this.filePath, JSON.stringify(this.state, null, 2));
-            console.log('🔄 Estado reiniciado');
+            console.log('🔄 Estado interno de test reiniciado');
         } catch (error) {
             console.error('❌ Error al reiniciar el estado:', error);
         }
