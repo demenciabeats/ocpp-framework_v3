@@ -1,8 +1,8 @@
-import { test } from '../fixtures/ocppFixture';
-import stateManager from '../utils/stateManager';
-import testData from '../data/testData';
-import { bootNotification, statusNotification, changeAvailability } from '../utils/testHelpers';
-import { waitForResponse } from '../utils/waitForResponse';
+import { test } from '../../fixtures/ocppFixture';
+import stateManager from '../../utils/stateManager';
+import testData from '../../data/testData';
+import { bootNotification, statusNotification, changeAvailability } from '../../utils/testHelpers';
+import { waitForResponse } from '../../utils/waitForResponse';
 
 test.describe.serial('@carga ChangeAvailability', () => {
   test('Flujo completo: StatusNotification (Available) → ChangeAvailability (Operative) → [Simulación CSMS] ChangeAvailability (Unavailable) → StatusNotification (Unavailable)', async ({ ocppClient }) => {

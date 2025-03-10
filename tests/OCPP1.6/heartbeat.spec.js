@@ -1,43 +1,30 @@
 import { test } from '../../fixtures/ocppFixture';
-import { waitForResponse } from '../../utils/waitForResponse';
+import { expect } from '@playwright/test';
+import { bootNotification, authorize, heartbeat } from '../../utils/testHelpers';
+import stateManager from '../../utils/stateManager';
+import testData from '../../data/testData';
 
-test.describe.serial('@carga 🩺 Enviar Heartbeat', () => {
-    test('🩺 Heartbeat', { timeout: 7000 }, async ({ ocppClient }) => {
-        for (let i = 1; i <= 5; i++) {
-            const uniqueId = ocppClient.sendHeartbeat();
-            const response = await waitForResponse(ocppClient, uniqueId);
-            console.log(`📥 Respuesta Heartbeat (${i}):`, response);
-            console.log(`🩺 Heartbeat enviado (${i})`);
-            // Se reduce el delay para evitar tiempo de espera excesivo
-            await new Promise(resolve => setTimeout(resolve, 5000));
-        }
+test.describe.serial('@carga Heartbeat', () => {
+  test('Enviar Heartbeat inmediatamente después de Authorize', async ({ ocppClient }) => {
+    await test.step('Preparar el estado con BootNotification', async () => {
+      if (!stateManager.state.bootNotificationSent) {
+        const bootRes = await bootNotification(ocppClient, testData.bootNotification);
+        console.log('<= Respuesta BootNotification:', bootRes);
+        stateManager.saveState({ bootNotificationSent: true });
+      }
     });
-});
 
-test.describe.serial('@carga ⚡ Iniciar StartTransaction', () => {
-    test('⚡ StartTransaction', async ({ ocppClient }) => {
-        if (!stateManager.state.bootNotificationSent) {
-            throw new Error('🚨 No se puede iniciar la transacción sin BootNotification.');
-        }
-        await new Promise(resolve => setTimeout(resolve, 5000));
+    await test.step('Enviar Authorize y luego Heartbeat', async () => {
+      console.log('🔑 Enviando Authorize...');
+      const authRes = await authorize(ocppClient, testData.authorize.idTag);
+      console.log('<= Respuesta Authorize:', authRes);
+      expect(authRes).toBeDefined();
+      stateManager.saveState({ authorized: true });
 
-        if (!stateManager.state.authorized) {
-            throw new Error('🚨 No se puede iniciar la transacción sin Authorize.');
-        }
-        const uniqueId = ocppClient.sendStartTransaction(
-            Number(process.env.CONNECTOR_ID),
-            process.env.ID_TAG,
-            100,
-            new Date().toISOString()
-        );
-        const response = await waitForResponse(ocppClient, uniqueId);
-        console.log("📥 Respuesta StartTransaction:", response);
-        if (response.idTagInfo && response.idTagInfo.status === "Accepted") {
-            const realTransactionId = response.transactionId;
-            console.log(`🤝 StartTransaction aceptado con transactionId: ${realTransactionId}`);
-            stateManager.saveState({ transactionId: realTransactionId });
-        } else {
-            console.log("⚠️ StartTransaction rechazado o con estado desconocido:", response);
-        }
+      console.log('🩺 Enviando Heartbeat...');
+      const heartbeatRes = await heartbeat(ocppClient);
+      console.log('<= Respuesta Heartbeat:', heartbeatRes);
+      expect(heartbeatRes).toBeDefined();
     });
+  });
 });
