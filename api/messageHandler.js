@@ -1,11 +1,8 @@
 export function handleMessage(data) {
-    console.log('📥 Recibido:', data);
-
     let parsedData;
 
     try {
-        // Convertir buffer a cadena de texto si es necesario
-        if (Buffer.isBuffer(data)) {
+            if (Buffer.isBuffer(data)) {
             data = data.toString('utf-8');
         }
 

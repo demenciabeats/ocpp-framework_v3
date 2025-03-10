@@ -57,7 +57,7 @@ export function sendMeterValues(ocppClient, connectorId, transactionId, meterVal
         uniqueId,
         "MeterValues",
         {
-            connectorId, // Asegurarse de incluir el connectorId
+            connectorId,
             transactionId,
             meterValue: meterValues
         }

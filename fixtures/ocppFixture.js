@@ -5,7 +5,6 @@ import stateManager from '../utils/stateManager';
 import path from 'path';
 import fs from 'fs';
 
-// Cargar variables de entorno
 dotenv.config();
 
 // Verificar si existe un archivo .env.local y también cargarlo (tiene precedencia)
@@ -16,7 +15,6 @@ if (fs.existsSync(envLocalPath)) {
 
 export const test = base.extend({
     ocppClient: async ({}, use) => {
-        // Reiniciar estado para cada test
         stateManager.resetState();
 
         // Obtener URL y ID del punto de carga desde variables de entorno o usar valores predeterminados

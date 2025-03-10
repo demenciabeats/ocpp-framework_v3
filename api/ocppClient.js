@@ -1,18 +1,15 @@
 import WebSocket from 'ws';
 import { handleMessage } from './messageHandler';
 import { generateUniqueId } from './utils';
-import { sendGenericRequest } from './genericClient';
 
 class OcppClient {
     constructor(wsUrl, chargePointId) {
-        // Validar parámetros de entrada
         if (!wsUrl) {
             throw new Error('El parámetro wsUrl es requerido. Verifica tu archivo .env');
         }
         if (!chargePointId) {
             throw new Error('El parámetro chargePointId es requerido. Verifica tu archivo .env');
-        }
-        
+        }        
         this.wsUrl = wsUrl;
         this.chargePointId = chargePointId;
         this.socket = null;
@@ -61,7 +58,7 @@ class OcppClient {
         this.socket.close();
     }
 
-    // Métodos para construir y enviar mensajes OCPP específicos
+    
     sendBootNotification(vendor, model, serialNumber, chargeBoxSerialNumber, firmwareVersion, iccid, imsi, meterType, meterSerialNumber) {
         const uniqueId = generateUniqueId();
         const message = [
@@ -120,7 +117,7 @@ class OcppClient {
             uniqueId,
             "MeterValues",
             {
-                connectorId,  // Ahora se incluye el connectorId
+                connectorId,
                 transactionId,
                 meterValue
             }
@@ -227,20 +224,9 @@ class OcppClient {
                     }
                 ]
             };
-
-            // Ahora se pasa connector.connectorId
             this.sendMeterValues(connector.connectorId, transactionId, [meterValue]);
             durationSeconds -= intervalSeconds;
         }, intervalSeconds * 1000);
-    }
-
-    /**
-     * Envía una petición genérica usando la configuración especificada.
-     * @param {Object} config - Configuración de la petición definida en formato JSON.
-     * @returns {Promise<Object>} Resultado de la petición y validación.
-     */
-    async sendGenericAPIRequest(config) {
-        return sendGenericRequest(config);
     }
 
     sendChangeAvailability(connectorId, type) {
