@@ -68,15 +68,23 @@ export function sendMeterValues(ocppClient, connectorId, transactionId, meterVal
 
 export function sendStopTransaction(ocppClient, stopData) {
     const uniqueId = generateUniqueId();
+    // Construir el payload sin los campos opcionales vacíos y convertir meterStop a entero
+    const payload = {
+        transactionId: stopData.transactionId,
+        meterStop: Math.round(stopData.meterStop), // Asegurar valor entero
+        timestamp: stopData.timestamp
+    };
+    if (stopData.idTag && stopData.idTag.trim() !== "") {
+        payload.idTag = stopData.idTag;
+    }
+    if (stopData.reason && stopData.reason.trim() !== "") {
+        payload.reason = stopData.reason;
+    }
     const message = [
         2,
         uniqueId,
         "StopTransaction",
-        {
-            transactionId: stopData.transactionId,
-            meterStop: stopData.meterStop,
-            timestamp: stopData.timestamp
-        }
+        payload
     ];
     ocppClient.sendMessage(message);
     return uniqueId;
@@ -102,9 +110,12 @@ export function sendStatusNotification(ocppClient, statusData) {
         "StatusNotification",
         {
             connectorId: statusData.connectorId,
+            errorCode: statusData.errorCode || "NoError", // Se asigna "NoError" por defecto
+            info: statusData.info || "",
             status: statusData.status,
-            errorCode: statusData.errorCode,
-            timestamp: new Date().toISOString()
+            timestamp: statusData.timestamp || new Date().toISOString(),
+            vendorErrorCode: statusData.vendorErrorCode || "",
+            vendorId: statusData.vendorId || ""
         }
     ];
     ocppClient.sendMessage(message);

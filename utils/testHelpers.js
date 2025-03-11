@@ -48,3 +48,81 @@ export async function changeAvailability(ocppClient, connectorId, type) {
 export async function simulateCharging(ocppClient, transactionId, intervalSeconds, durationSeconds, connector) {
     await generateAndSendMeterValues(ocppClient, transactionId, intervalSeconds, durationSeconds, connector);
 }
+
+// Nuevo flujo flowCharge
+export async function flowCharge(ocppClient, authData, startData, statusData, connector) {
+  // Autorizar
+  await authorize(ocppClient, authData);
+  // Iniciar Transacción y obtener la respuesta para extraer el transactionId real
+  const startResponse = await startTransaction(ocppClient, startData);
+  const transactionId = startResponse.transactionId; // Se extrae el transactionId de la respuesta
+  // Enviar statusNotification con estado "Charging"
+  const chargingStatus = { ...statusData, status: "Charging", connectorId: startData.connectorId };
+  await statusNotification(ocppClient, chargingStatus);
+  
+  // Esperar 30 segundos
+  await new Promise(resolve => setTimeout(resolve, 30000));
+  
+  // Enviar MeterValues: inmediato y cada 10 segundos por 1 minuto y medio (9 ciclos)
+  const cycles = 9;
+  let meterValueCounter = 0;
+  let currentSoc = connector.initialSoc;
+  for (let i = 0; i <= cycles; i++) {
+    const now = new Date().toISOString();
+    const power = connector.maxPower * 1000; // Convertir kW a W
+    const energyDelivered = (power * 10) / 3600; // Energía en Wh para intervalo de 10 seg.
+    meterValueCounter += energyDelivered;
+    currentSoc += (energyDelivered / (connector.batteryCapacity * 1000)) * 100;
+  
+    const meterValue = {
+      timestamp: now,
+      sampledValue: [
+        {
+          value: currentSoc.toFixed(2),
+          unit: "Percent",
+          context: "Sample.Periodic",
+          format: "Raw",
+          measurand: "SoC",
+          location: "EVSE"
+        },
+        {
+          value: power.toFixed(2),
+          unit: "W",
+          context: "Sample.Periodic",
+          format: "Raw",
+          measurand: "Power.Active.Import",
+          location: "Outlet"
+        },
+        {
+          value: energyDelivered.toFixed(2),
+          unit: "A",
+          context: "Sample.Periodic",
+          format: "Raw",
+          measurand: "Current.Import",
+          location: "Outlet"
+        },
+        {
+          value: meterValueCounter.toFixed(2),
+          unit: "Wh",
+          context: "Sample.Periodic",
+          format: "Raw",
+          measurand: "Energy.Active.Import.Register",
+          location: "Outlet"
+        }
+      ]
+    };
+    // Enviar MeterValues usando el transactionId obtenido de la respuesta
+    ocppClient.sendMeterValues(connector.connectorId, transactionId, [meterValue]);
+    if (i < cycles) {
+      await new Promise(resolve => setTimeout(resolve, 10000));
+    }
+  }
+  
+  // Enviar StopTransaction con el acumulado
+  const stopData = {
+    transactionId,
+    meterStop: meterValueCounter,
+    timestamp: new Date().toISOString()
+  };
+  await stopTransaction(ocppClient, stopData);
+}

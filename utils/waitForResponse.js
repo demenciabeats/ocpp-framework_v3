@@ -12,6 +12,11 @@ export async function waitForResponse(ocppClient, requestId, timeoutMs = 8000) {
           ocppClient.socket.off('message', onMessage);
           resolve(data[2]);
         }
+        // Manejo de errores: si se recibe respuesta tipo 4 para el requestId, rechaza la promesa
+        if (data[0] === 4 && String(data[1]) === String(requestId)) {
+          ocppClient.socket.off('message', onMessage);
+          return reject(new Error(`Error response: ${data[2]} - ${data[3]}`));
+        }
       } catch (error) {
         console.error('❌ Error al procesar el mensaje:', error);
       }
