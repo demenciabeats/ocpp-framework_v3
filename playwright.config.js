@@ -4,7 +4,7 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 export default defineConfig({
-    timeout: 240000,
+    timeout: 300000,
     use: {
         baseURL: process.env.WS_URL
     },

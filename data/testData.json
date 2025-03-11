@@ -1,0 +1,36 @@
+{
+  "bootNotification": {
+    "vendor": "Dhemax",
+    "model": "Model-X",
+    "serialNumber": "SN-12345678",
+    "chargeBoxSerialNumber": "EV.2S7P04",
+    "firmwareVersion": "3.3.0.10",
+    "iccid": "8901120000000000000",
+    "imsi": "123456789012345",
+    "meterType": "DhemaxMeter",
+    "meterSerialNumber": "MTR-001"
+  },
+  "authorize": {
+    "idTag": "BB2TBR09"
+  },
+  "startTransaction": {
+    "connectorId": 1,
+    "idTag": "BB2TBR09",
+    "meterStart": 100,
+    "timestamp": "2025-03-08T12:00:00Z"
+  },
+  "connector": {
+    "connectorId": 1,
+    "maxPower": 22,
+    "batteryCapacity": 50,
+    "initialSoc": 20
+  },
+  "meterValuesConfig": {
+    "intervalSeconds": 10,
+    "durationSeconds": 120
+  },
+  "stopTransaction": {
+    "meterStop": 300,
+    "timestamp": "2025-03-08T12:15:00Z"
+  }
+}

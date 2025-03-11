@@ -1,38 +1,26 @@
 import { test } from '../../fixtures/ocppFixture';
 import stateManager from '../../utils/stateManager';
-import { waitForResponse } from '../../utils/waitForResponse';
-import path from 'path';
+import testData from '../../data/testData';
+import { stopMeterValues } from '../../api/utils';
+import {
+    bootNotification,
+    authorize,
+    startTransaction,
+    stopTransaction,
+    heartbeat,
+    statusNotification,
+    simulateCharging,
+    changeAvailability
+} from '../../utils/testHelpers';
 
-const scriptPath = path.join(process.cwd(), 'utils', 'analyzeMeterValues.js');
 
 test.describe.serial('@carga FlujoCompleto', () => {
-  test('Flujo entero: BootNotification, Authorize, StartTransaction, MeterValues, StopTransaction', async ({ ocppClient }) => {
+  test('Flujo entero: BootNotification, StatusNotification, Authorize, StartTransaction, MeterValues, Heartbeat, StopTransaction', async ({ ocppClient }) => {
     /**
      * 1. BootNotification (si no se ha enviado aún)
      */
     if (!stateManager.state.bootNotificationSent) {
-      const bootReqId = "123";
-      const bootNotification = [
-        2, 
-        bootReqId,
-        "BootNotification",
-        {
-          "chargePointVendor": "infypower",
-          "chargePointModel": "Infi4ever",
-          "chargePointSerialNumber": "SN-12345678",
-          "chargeBoxSerialNumber": "EV.2S7P04",
-          "firmwareVersion": "3.3.0.10",
-          "iccid": "8901120000000000000",
-          "imsi": "123456789012345",
-          "meterType": "DhemaxMeter",
-          "meterSerialNumber": "MTR-001"
-        }
-      ];
-
-      console.log('=> Enviando BootNotification...');
-      ocppClient.sendMessage(bootNotification);
-
-      const bootRes = await waitForResponse(ocppClient, bootReqId);
+      const bootRes = await bootNotification(ocppClient, testData.bootNotification);
       console.log('<= Respuesta BootNotification:', bootRes);
       stateManager.saveState({ bootNotificationSent: true });
     } else {
@@ -40,15 +28,57 @@ test.describe.serial('@carga FlujoCompleto', () => {
     }
 
     /**
-     * 2. Authorize (si no se ha autorizado aún)
+     * 2. StatusNotification (Available)
+     */
+    console.log('⚡ Enviando StatusNotification (Available)...');
+    const statusRes = await statusNotification(ocppClient, {
+      connectorId: testData.startTransaction.connectorId,
+      status: "Available",
+      errorCode: "NoError"
+    });
+    console.log('<= Respuesta StatusNotification:', statusRes);
+
+    /**
+     * 3. ChangeAvailability (Establecer como Operative para iniciar, luego simular cambio a Unavailable)
+     */
+    console.log('🔄 Configurando conector como Operative...');
+    // const changeRes = await changeAvailability(ocppClient, testData.startTransaction.connectorId, "Operative");
+    // console.log('<= Respuesta ChangeAvailability:', changeRes);
+    // test.expect(["Accepted", "Rejected", "Scheduled"]).toContain(changeRes.status);
+    // if (changeRes.status === "Accepted") {
+    //   console.log(`✅ El conector ${testData.startTransaction.connectorId} está listo para operar`);
+    //   // Enviar StatusNotification por parte del cargador para reflejar disponibilidad operativa
+    //   const statusNotifRes1 = await statusNotification(ocppClient, {
+    //      connectorId: testData.startTransaction.connectorId,
+    //      status: "Available",
+    //      errorCode: "NoError",
+    //      timestamp: new Date().toISOString()
+    //   });
+    //   console.log('<= Respuesta StatusNotification posterior a ChangeAvailability (Available):', statusNotifRes1);
+    // } else {
+    //   console.log(`⚠️ Estado de cambio de disponibilidad: ${changeRes.status}`);
+    // }
+    
+    // Nuevo paso: Simular que el CSMS envía un comando ChangeAvailability a "Unavailable"
+    await test.step('Simular recepción CSMS - ChangeAvailability y enviar StatusNotification(Unavailable)', async () => {
+      const simulatedCmd = {
+          connectorId: testData.startTransaction.connectorId,
+          type: "Unavailable"
+      };
+      console.log('🔄 Simulando recepción de ChangeAvailability desde CSMS:', simulatedCmd);
+      // El cargador procesa el comando
+      const statusNotifReqId = ocppClient.handleChangeAvailability(simulatedCmd);
+      // Esperar la respuesta para la StatusNotification enviada por el cargador
+      const statusNotifRes2 = await waitForResponse(ocppClient, statusNotifReqId, 15000);
+      console.log('<= Respuesta StatusNotification tras ChangeAvailability (Unavailable):', statusNotifRes2);
+      test.expect(statusNotifRes2.status || statusNotifRes2.currentTime).toBeDefined();
+    });
+
+    /**
+     * 4. Authorize (si no se ha autorizado aún)
      */
     if (!stateManager.state.authorized) {
-      const authReqId = "AUTH-1";
-      console.log('=> Enviando Authorize...');
-      ocppClient.sendMessage([2, authReqId, "Authorize", {
-        idTag: process.env.ID_TAG
-      }]);
-      const authRes = await waitForResponse(ocppClient, authReqId);
+      const authRes = await authorize(ocppClient, testData.authorize.idTag);
       console.log('<= Respuesta Authorize:', authRes);
       stateManager.saveState({ authorized: true });
     } else {
@@ -56,18 +86,10 @@ test.describe.serial('@carga FlujoCompleto', () => {
     }
 
     /**
-     * 3. StartTransaction (obtener transactionId real)
+     * 5. StartTransaction (obtener transactionId real)
      */
     if (!stateManager.state.transactionId) {
-      const startReqId = "ST-1";
-      console.log('=> Enviando StartTransaction...');
-      ocppClient.sendMessage([2, startReqId, "StartTransaction", {
-        connectorId: Number(process.env.CONNECTOR_ID),
-        idTag: process.env.ID_TAG,
-        meterStart: 100,
-        timestamp: new Date().toISOString()
-      }]);
-      const startRes = await waitForResponse(ocppClient, startReqId);
+      const startRes = await startTransaction(ocppClient, testData.startTransaction);
       console.log('<= Respuesta StartTransaction:', startRes);
 
       if (startRes?.idTagInfo?.status === "Accepted") {
@@ -81,68 +103,67 @@ test.describe.serial('@carga FlujoCompleto', () => {
     }
 
     /**
-     * 4. Simular carga con MeterValues incrementales
+     * 6. Simular carga con MeterValues incrementales
      */
     const txId = stateManager.state.transactionId;
     if (!txId) {
       throw new Error('🚨 No hay transactionId para enviar MeterValues.');
     }
-    let meterValueCounter = 100;
-    for (let i = 1; i <= 6; i++) {
-      meterValueCounter += Math.floor(Math.random() * 50) + 20; // Valor base que se incrementa aleatoriamente
-      const meterReqId = `MV-${i}`;
-      const meterValuePayload = {
-        connectorId: Number(process.env.CONNECTOR_ID),
-        transactionId: txId,
-        meterValue: [{
-          timestamp: new Date().toISOString(),
-          sampledValue: [{
-            value: `${meterValueCounter}`,
-            unit: "Wh",
-            measurand: "Energy.Active.Import.Register"
-          }]
-        }]
-      };
-      console.log(`=> Enviando MeterValues (${i}):`, meterValuePayload);
-      ocppClient.sendMessage([2, meterReqId, "MeterValues", meterValuePayload]);
 
-      try {
-        const mvResp = await waitForResponse(ocppClient, meterReqId);
-        console.log(`<= Respuesta MeterValues (${i}):`, mvResp);
-      } catch {
-        console.log(`⚠️ No se recibió respuesta para MeterValues (${i}), continuando...`);
-      }
+    const { intervalSeconds, durationSeconds } = testData.meterValuesConfig;
+    const connector = testData.connector;
 
-      // Espera entre mediciones (por ejemplo, 5 segundos)
-      await new Promise(resolve => setTimeout(resolve, 5000));
-    }
+    // Iniciar el envío de MeterValues
+    const meterValuesPromise = simulateCharging(
+      ocppClient,
+      txId,
+      intervalSeconds,
+      durationSeconds,
+      connector
+    );
 
     /**
-     * 5. Mantener la conexión con StatusNotification (opcional)
+     * 7. Enviar Heartbeat después de 1 minuto de carga
      */
-    console.log('⏳ Manteniendo la carga activa y enviando StatusNotification cada 10s...');
-    for (let i = 0; i < 10; i++) {
-      await new Promise(resolve => setTimeout(resolve, 10000));
-      ocppClient.sendMessage([2, `SN-${i}`, "StatusNotification", {
-        connectorId: Number(process.env.CONNECTOR_ID),
-        status: "Charging",
-        errorCode: "NoError",
-        timestamp: new Date().toISOString()
-      }]);
-      console.log(`⏱ StatusNotification #${i + 1} enviado`);
-    }
+    const heartbeatPromise = new Promise((resolve) => {
+      setTimeout(async () => {
+        console.log('🩺 Enviando Heartbeat...');
+        const heartbeatRes = await heartbeat(ocppClient);
+        console.log('<= Respuesta Heartbeat:', heartbeatRes);
+        resolve();
+      }, 60000); // 1 minuto
+    });
 
     /**
-     * 6. StopTransaction
+     * 8. StopTransaction después de 1:30 minutos de carga
      */
-    console.log('🛑 Enviando StopTransaction...');
-    const stopReqId = "STP-1";
-    ocppClient.sendMessage([2, stopReqId, "StopTransaction", {
-      transactionId: txId,
-      meterStop: 300,
-      timestamp: new Date().toISOString()
-    }]);
-    const stopRes = await waitForResponse(ocppClient, stopReqId, 10000);
-    console.log('<= Respuesta StopTransaction:', stopRes);
+    const stopTransactionPromise = new Promise((resolve) => {
+      setTimeout(async () => {
+        console.log('🛑 Enviando StopTransaction...');
+        const stopRes = await stopTransaction(ocppClient, {
+          transactionId: txId,
+          meterStop: testData.stopTransaction.meterStop,
+          timestamp: testData.stopTransaction.timestamp
+        });
+        console.log('<= Respuesta StopTransaction:', stopRes);
+
+        // Indicarle a generateAndSendMeterValues que detenga el loop
+        stopMeterValues();
+
+        resolve();
+      }, 90000); // 1:30 minutos
+    });
+
+    /**
+     * 9. Establecer conector como Inoperative después de finalizar
+     */
+    setTimeout(async () => {
+      console.log('🔄 Configurando conector como Inoperative después de la sesión...');
+      const changeResEnd = await changeAvailability(ocppClient, testData.startTransaction.connectorId, "Inoperative");
+      console.log('<= Respuesta ChangeAvailability:', changeResEnd);
+    }, 95000); // 1:35 minutos (después del StopTransaction)
+
+    // Esperar a que todas las promesas se completen antes de cerrar la conexión
+    await Promise.all([meterValuesPromise, heartbeatPromise, stopTransactionPromise]);
   });
 });

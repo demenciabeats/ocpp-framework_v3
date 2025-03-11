@@ -1,50 +1,55 @@
 import { test } from '../../fixtures/ocppFixture';
 import stateManager from '../../utils/stateManager';
+import testData from '../../data/testData';
+import { bootNotification, authorize, startTransaction, statusNotification, simulateCharging } from '../../utils/testHelpers';
 
-test.describe.serial('@carga 📊 Reportar MeterValues', () => {
-    test('📊 MeterValues', async ({ ocppClient }) => {
-        if (!stateManager.state.transactionId) {
-            console.log('🚀 Transacción no activa, iniciando StartTransaction automáticamente...');
-            if (!stateManager.state.bootNotificationSent) {
-                console.log('📢 BootNotification no enviado, enviando ahora...');
-                ocppClient.sendMessage([2, "001", "BootNotification", {
-                    chargePointVendor: "Dhemax",
-                    chargePointModel: "Model-X"
-                }]);
-                stateManager.saveState({ bootNotificationSent: true });
-            }
-            if (!stateManager.state.authorized) {
-                console.log('✅ Authorize no enviado, enviando ahora...');
-                ocppClient.sendMessage([2, "002", "Authorize", {
-                    idTag: process.env.ID_TAG
-                }]);
-                stateManager.saveState({ authorized: true });
-            }
-            const transactionId = "003"; 
-            ocppClient.sendMessage([2, "003", "StartTransaction", {
-                connectorId: Number(process.env.CONNECTOR_ID),
-                idTag: process.env.ID_TAG,
-                meterStart: 100,
-                timestamp: new Date().toISOString()
-            }]);
-            stateManager.saveState({ transactionId });
+test.describe.serial('@carga MeterValues', () => {
+  test('Enviar MeterValues', async ({ ocppClient }) => {
+    await test.step('Enviar BootNotification, Authorize y StartTransaction si es necesario', async () => {
+      if (!stateManager.state.bootNotificationSent) {
+        const bootRes = await bootNotification(ocppClient, testData.bootNotification);
+        console.log('<= Respuesta BootNotification:', bootRes);
+        stateManager.saveState({ bootNotificationSent: true });
+      }
+      if (!stateManager.state.authorized) {
+        const authRes = await authorize(ocppClient, testData.authorize.idTag);
+        console.log('<= Respuesta Authorize:', authRes);
+        stateManager.saveState({ authorized: true });
+      }
+      if (!stateManager.state.transactionId) {
+        const startRes = await startTransaction(ocppClient, testData.startTransaction);
+        console.log('<= Respuesta StartTransaction:', startRes);
+        if (startRes?.idTagInfo?.status === "Accepted") {
+          stateManager.saveState({ transactionId: startRes.transactionId });
+          console.log(`🤝 StartTransaction aceptado. transactionId real: ${startRes.transactionId}`);
+        } else {
+          throw new Error(`StartTransaction rechazado o inválido: ${JSON.stringify(startRes)}`);
         }
-
-        for (let i = 1; i <= 3; i++) { 
-            ocppClient.sendMessage([2, `004-${i}`, "MeterValues", {
-                transactionId: stateManager.state.transactionId,
-                meterValue: [{
-                    timestamp: new Date().toISOString(),
-                    sampledValue: [{
-                        value: `${100 + i * 50}`,
-                        unit: "Wh",
-                        measurand: "Energy.Active.Import.Register"
-                    }]
-                }]
-            }]);
-
-            // Se reduce el tiempo de espera para pruebas
-            await new Promise(resolve => setTimeout(resolve, 1000));
-        }
+      }
     });
+    
+    await test.step('Enviar StatusNotification iniciando carga', async () => {
+      console.log('⚡ Enviando StatusNotification (Charging)...');
+      const statusRes = await statusNotification(ocppClient, {
+        connectorId: testData.startTransaction.connectorId,
+        status: "Charging",
+        errorCode: "NoError"
+      });
+      console.log('<= Respuesta StatusNotification:', statusRes);
+    });
+    
+    await test.step('Simular carga con MeterValues', async () => {
+      const txId = stateManager.state.transactionId;
+      if (!txId) throw new Error('🚨 No hay transactionId para enviar MeterValues.');
+      
+      const { intervalSeconds, durationSeconds } = testData.meterValuesConfig;
+      const connector = testData.connector;
+      
+      // Llamada asíncrona para simular la carga
+      await simulateCharging(ocppClient, txId, intervalSeconds, durationSeconds, connector);
+      
+      // Esperar a que se generen todos los MeterValues antes de finalizar
+      await new Promise(resolve => setTimeout(resolve, durationSeconds * 1000));
+    });
+  });
 });

@@ -1,40 +1,55 @@
 import { test } from '../../fixtures/ocppFixture';
-import { execFileSync } from 'child_process';
-import path from 'path';
 import stateManager from '../../utils/stateManager';
+import testData from '../../data/testData';
+import { bootNotification, authorize, startTransaction, stopTransaction } from '../../utils/testHelpers';
 
-const scriptPath = path.join(process.cwd(), 'utils', 'analyzeMeterValues.js');
+test.describe.serial('@carga StopTransaction', () => {
+  test('Enviar StopTransaction', async ({ ocppClient }) => {
+    if (!stateManager.state.bootNotificationSent) {
+      const bootRes = await bootNotification(ocppClient, testData.bootNotification);
+      console.log('<= Respuesta BootNotification:', bootRes);
+      stateManager.saveState({ bootNotificationSent: true });
+    }
 
-test.describe.serial('@carga 🛑 Finalizar StopTransaction', () => {
-    test('🛑 StopTransaction', { timeout: 120000 }, async ({ ocppClient }) => {
-        // 1. Obtenemos la transacción real guardada
-        const transactionId = stateManager.state.transactionId;
-        if (!transactionId) {
-            throw new Error('🚨 No existe transactionId, no se puede detener la transacción.');
+    if (!stateManager.state.authorized) {
+      const authRes = await authorize(ocppClient, testData.authorize.idTag);
+      console.log('<= Respuesta Authorize:', authRes);
+      stateManager.saveState({ authorized: true });
+    }
+
+    if (!stateManager.state.transactionId) {
+      const startRes = await startTransaction(ocppClient, testData.startTransaction);
+      console.log('<= Respuesta StartTransaction:', startRes);
+
+      if (startRes?.idTagInfo?.status === "Accepted") {
+        stateManager.saveState({ transactionId: startRes.transactionId });
+        console.log(`🤝 StartTransaction aceptado. transactionId real: ${startRes.transactionId}`);
+      } else {
+        throw new Error(`StartTransaction rechazado o inválido: ${JSON.stringify(startRes)}`);
+      }
+    }
+
+    const txId = stateManager.state.transactionId;
+    if (!txId) {
+      throw new Error('🚨 No hay transactionId para enviar StopTransaction.');
+    }
+
+    // Envolver el envío de StopTransaction en una promesa para esperar su respuesta
+    await new Promise((resolve, reject) => {
+      setTimeout(async () => {
+        try {
+          console.log('🛑 Enviando StopTransaction...');
+          const stopRes = await stopTransaction(ocppClient, {
+            transactionId: txId,
+            meterStop: testData.stopTransaction.meterStop,
+            timestamp: testData.stopTransaction.timestamp
+          });
+          console.log('<= Respuesta StopTransaction:', stopRes);
+          resolve(stopRes);
+        } catch (error) {
+          reject(error);
         }
-
-        // 2. Enviamos StatusNotification cada 10s durante 60s para mantener la conexión
-        console.log('⏳ Manteniendo la carga activa y enviando StatusNotification cada 10s durante 1 minuto...');
-        for (let i = 0; i < 12; i++) {
-            await new Promise(resolve => setTimeout(resolve, 10000));
-            ocppClient.sendMessage([2, `status-${i}`, "StatusNotification", {
-                connectorId: Number(process.env.CONNECTOR_ID),
-                status: "Charging",
-                errorCode: "NoError",
-                timestamp: new Date().toISOString()
-            }]);
-            console.log(`⏱ StatusNotification #${i + 1} enviado`);
-        }
-
-        // 3. Enviamos StopTransaction con el transactionId real
-        console.log('🛑 Enviando StopTransaction...');
-        ocppClient.sendMessage([2, "006", "StopTransaction", {
-            transactionId,
-            meterStop: 300,
-            timestamp: new Date().toISOString()
-        }]);
-
-        console.log('📊 Ejecutando análisis de MeterValues...');
-        execFileSync('node', [scriptPath], { stdio: 'inherit' });
+      }, 10000); // 10 segundos para el test (ajustable)
     });
+  });
 });

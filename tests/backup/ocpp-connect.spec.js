@@ -1,9 +1,12 @@
 import { test, expect } from '@playwright/test';
-import OcppClient from '../api/ocppClient';
-import { waitForResponse } from '../utils/waitForResponse';
+import OcppClient from '../../api/ocppClient';
+import { waitForResponse } from '../../utils/waitForResponse';
 import dotenv from 'dotenv';
+import fs from 'fs';
 
 dotenv.config();
+
+const testData = JSON.parse(fs.readFileSync('./data/testData.json', 'utf-8'));
 
 test.describe('🔌 Conexión al WebSocket OCPP 1.6 y envío de BootNotification + Heartbeat', () => {
     let ocppClient;
@@ -18,25 +21,18 @@ test.describe('🔌 Conexión al WebSocket OCPP 1.6 y envío de BootNotification
         // 2️⃣ Enviar BootNotification
         console.log("⚡ Enviando BootNotification...");
 
-        const uniqueId = "123";
-        const bootNotification = [
-            2, 
-            uniqueId, 
-            "BootNotification",
-            {
-                "chargePointVendor": "infypower",
-                "chargePointModel": "Infi4ever",
-                "chargePointSerialNumber": "SN-12345678",
-                "chargeBoxSerialNumber": "EV.2S7P04",
-                "firmwareVersion": "3.3.0.10",
-                "iccid": "8901120000000000000",
-                "imsi": "123456789012345",
-                "meterType": "DhemaxMeter",
-                "meterSerialNumber": "MTR-001"
-            }
-        ];
-
-        ocppClient.sendMessage(bootNotification);
+        const bootData = testData.bootNotification;
+        const uniqueId = ocppClient.sendBootNotification(
+            bootData.vendor,
+            bootData.model,
+            bootData.serialNumber,
+            bootData.chargeBoxSerialNumber,
+            bootData.firmwareVersion,
+            bootData.iccid,
+            bootData.imsi,
+            bootData.meterType,
+            bootData.meterSerialNumber
+        );
 
         const bootResponse = await waitForResponse(ocppClient, uniqueId);
 
@@ -55,8 +51,8 @@ test.describe('🔌 Conexión al WebSocket OCPP 1.6 y envío de BootNotification
         await new Promise(resolve => setTimeout(resolve, heartbeatInterval * 1000));
         console.log("⚡ Enviando Heartbeat...");
 
-        const heartbeatMessage = [2, "456", "Heartbeat", {}];
-        const heartbeatResponse = await waitForResponse(ocppClient, "456");
+        const heartbeatUniqueId = ocppClient.sendHeartbeat();
+        const heartbeatResponse = await waitForResponse(ocppClient, heartbeatUniqueId);
 
         console.log("📥 Respuesta al Heartbeat:", heartbeatResponse);
         expect(heartbeatResponse.currentTime).toBeDefined();
