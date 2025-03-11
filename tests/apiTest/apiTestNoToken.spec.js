@@ -2,13 +2,14 @@ import { test, expect } from '@playwright/test';
 import apiConfig from '../../api/apiConfig';
 
 test.describe('API Tests', () => {
-   
     test('API pública sin autenticación', async ({ request }) => {
-        const response = await request.get(apiConfig.api2.url, {
-            headers: apiConfig.api2.defaultHeaders,
-            timeout: 15000
+        console.log("Request URL:", apiConfig.unlock.url);
+        console.log("Request Headers:", apiConfig.unlock.defaultHeaders);
+        const response = await request.post(apiConfig.unlock.url, {
+            headers: apiConfig.unlock.defaultHeaders,
+            timeout: 15000,
         });
-        expect(response.status()).toBe(apiConfig.api2.expectedResponse.status);
+        console.log("APIResponse:", await response.text());
+        expect(response.status()).toBe(apiConfig.unlock.expectedResponse.status);
     });
-
 });
