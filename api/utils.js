@@ -20,27 +20,27 @@ export function stopMeterValues() {
 
 export async function generateAndSendMeterValues(ocppClient, transactionId) {
     const { maxPower, batteryCapacity, initialSoc, connectorId } = testData.connector;
-    let { intervalSeconds, durationSeconds } = testData.meterValuesConfig; // Cambiar a let para poder modificar
+    let { intervalSeconds, durationSeconds } = testData.meterValuesConfig;
     let currentSoc = initialSoc;
     let meterValueCounter = 0;
     const meterValues = [];
 
     const filePath = path.resolve(__dirname, '../data/meterValues.json');
 
-    // Crear el archivo JSON vacío si no existe
+ 
     if (!fs.existsSync(filePath)) {
         fs.writeFileSync(filePath, JSON.stringify([], null, 2));
     }
 
-    // Devuelve una promesa para esperar al fin del intervalo
+    
     return new Promise((resolve) => {
         const intervalId = setInterval(() => {
-            // Detener si se pidió StopTransaction
+       
             if (stopRequested || durationSeconds <= 0) {
                 clearInterval(intervalId);
-                // Guardar los MeterValues en el archivo JSON
+              
                 fs.writeFileSync(filePath, JSON.stringify(meterValues, null, 2));
-                resolve(); // Finaliza la promesa
+                resolve(); 
                 return;
             }
 

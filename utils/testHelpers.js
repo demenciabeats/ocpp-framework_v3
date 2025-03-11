@@ -42,7 +42,6 @@ export async function statusNotification(ocppClient, statusData) {
 
 export async function changeAvailability(ocppClient, connectorId, type) {
     const changeAvailReqId = sendChangeAvailability(ocppClient, connectorId, type);
-    // Aumentamos el timeout a 15000ms (15 segundos) para esperar la respuesta del CSMS
     return await waitForResponse(ocppClient, changeAvailReqId, 30000);
 }
 

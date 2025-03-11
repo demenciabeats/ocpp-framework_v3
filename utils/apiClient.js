@@ -1,17 +1,11 @@
 import { request } from '@playwright/test';
 import { setToken, getToken } from './authManager';
 
-/**
- * Realiza una solicitud HTTP genérica.
- * @param {Object} config - Configuración de la API.
- * @returns {Object} - Respuesta de la API.
- */
 async function apiRequest(config) {
     const { method, url, headers = {}, body = null, requiresAuth = false, extractToken = false, tokenPath = "token" } = config;
     
     const context = await request.newContext();
     try {
-        // Si requiere autenticación, agregar el token almacenado
         if (requiresAuth) {
             const token = getToken();
             if (token) {
@@ -21,16 +15,13 @@ async function apiRequest(config) {
             }
         }
 
-        // Asegura que se envíe JSON correctamente
         const finalHeaders = {
             "Content-Type": "application/json",
             ...headers
         };
 
-        // Envía el cuerpo transformado a JSON (usando JSON.stringify siempre)
         const requestBody = body ? JSON.stringify(body) : undefined;
         
-        // Registros para depurar
         console.log("Request URL:", url);
         console.log("Request Method:", method);
         console.log("Request Headers:", finalHeaders);
@@ -40,12 +31,11 @@ async function apiRequest(config) {
             method,
             headers: finalHeaders,
             body: requestBody,
-            timeout: 15000 // Agregamos timeout de 15 segundos
+            timeout: 15000
         });
 
         const responseBody = await response.json().catch(() => null);
 
-        // Si es una API de login y extrae un token, lo guardamos
         if (extractToken && response.status() === 200) {
             const token = responseBody[tokenPath];
             if (token) {
@@ -61,7 +51,7 @@ async function apiRequest(config) {
             body: responseBody
         };
     } finally {
-        await context.dispose(); // Cerrar el contexto para liberar recursos
+        await context.dispose();
     }
 }
 

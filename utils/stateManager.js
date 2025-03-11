@@ -3,7 +3,6 @@ import path from 'path';
 
 class StateManager {
     constructor() {
-        // Definir la ruta del archivo de estado en la raíz del proyecto
         this.filePath = path.join(process.cwd(), 'data', 'state.json');
         this.state = { bootNotificationSent: false, authorized: false, transactionId: null };
         this.initializeState();
@@ -11,20 +10,17 @@ class StateManager {
 
     initializeState() {
         try {
-            // Asegurar que el directorio existe
             const dirPath = path.dirname(this.filePath);
             if (!fs.existsSync(dirPath)) {
                 fs.mkdirSync(dirPath, { recursive: true });
                 console.log(`🗂️ Directorio creado: ${dirPath}`);
             }
 
-            // Intentar cargar el estado existente
             if (fs.existsSync(this.filePath)) {
                 const savedState = JSON.parse(fs.readFileSync(this.filePath, 'utf-8'));
                 this.state = { ...this.state, ...savedState };
                 console.log('📝 Estado interno de test cargado:', this.state);
             } else {
-                // Si no existe, crear archivo con estado inicial
                 fs.writeFileSync(this.filePath, JSON.stringify(this.state, null, 2));
                 console.log('📝 Archivo de estado creado con valores iniciales');
             }
@@ -47,7 +43,6 @@ class StateManager {
         try {
             this.state = { bootNotificationSent: false, authorized: false, transactionId: null };
             
-            // Asegurar que el directorio existe antes de escribir
             const dirPath = path.dirname(this.filePath);
             if (!fs.existsSync(dirPath)) {
                 fs.mkdirSync(dirPath, { recursive: true });
@@ -61,6 +56,5 @@ class StateManager {
     }
 }
 
-// Singleton para usar en toda la aplicación
 const stateManager = new StateManager();
 export default stateManager;
