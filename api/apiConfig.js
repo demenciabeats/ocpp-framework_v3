@@ -57,17 +57,17 @@ const apiConfig = {
     reset: {
         name: "Reset Station",
         method: "POST",
-        url: "/em/station/reset",
+        url: "https://charger.manager.qa.dhemax.link/reset",
         defaultHeaders: {
             "Content-Type": "application/json",
             "App-id": "CMS"
         },
-        requiresAuth: true,
+        requiresAuth: false,
         expectedResponse: {
             status: 201
         },
         body: {
-            stationId: 456,
+            machineId: 456,
             resetType: "Hard"
         }
     },
