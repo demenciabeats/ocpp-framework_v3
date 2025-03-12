@@ -1,17 +1,22 @@
+import dotenv from 'dotenv'; // Añadido para cargar .env
+dotenv.config();
+
 import WebSocket from 'ws';
 import { handleMessage } from './messageHandler';
 import { generateUniqueId } from './utils';
 
 class OcppClient {
     constructor(wsUrl, chargePointId) {
-        if (!wsUrl) {
+        // Usar wsUrl y chargePointId pasados o obtenerlos de process.env
+        this.wsUrl = wsUrl || process.env.WS_URL;
+        this.chargePointId = chargePointId || process.env.CHARGE_POINT_ID;
+
+        if (!this.wsUrl) {
             throw new Error('El parámetro wsUrl es requerido. Verifica tu archivo .env');
         }
-        if (!chargePointId) {
+        if (!this.chargePointId) {
             throw new Error('El parámetro chargePointId es requerido. Verifica tu archivo .env');
-        }        
-        this.wsUrl = wsUrl;
-        this.chargePointId = chargePointId;
+        }
         this.socket = null;
     }
 
@@ -19,7 +24,6 @@ class OcppClient {
         return new Promise((resolve, reject) => {
             try {
                 const fullUrl = `${this.wsUrl}/${this.chargePointId}`;
-                console.log(`🔗 Intentando conectar a: ${fullUrl}`);
                 
                 this.socket = new WebSocket(fullUrl, ["ocpp1.6"], {
                     headers: {
@@ -54,10 +58,9 @@ class OcppClient {
     }
 
     close() {
-        console.log('🔌 Cerrando WebSocket');
+        console.log('💀 Cerrando WebSocket');
         this.socket.close();
     }
-
     
     sendBootNotification(vendor, model, serialNumber, chargeBoxSerialNumber, firmwareVersion, iccid, imsi, meterType, meterSerialNumber) {
         const uniqueId = generateUniqueId();
@@ -169,64 +172,6 @@ class OcppClient {
         ];
         this.sendMessage(message);
         return uniqueId;
-    }
-
-    async generateAndSendMeterValues(transactionId, intervalSeconds, durationSeconds, connector) {
-        const { maxPower, batteryCapacity, initialSoc } = connector;
-        let currentSoc = initialSoc;
-        let meterValueCounter = 0;
-
-        const intervalId = setInterval(() => {
-            if (durationSeconds <= 0) {
-                clearInterval(intervalId);
-                return;
-            }
-
-            const power = maxPower * 1000; // Convertir kW a W
-            const energyDelivered = (power * intervalSeconds) / 3600; // Energía en Wh
-            meterValueCounter += energyDelivered;
-            currentSoc += (energyDelivered / (batteryCapacity * 1000)) * 100; // Actualizar SOC
-
-            const meterValue = {
-                timestamp: new Date().toISOString(),
-                sampledValue: [
-                    {
-                        value: `${currentSoc.toFixed(2)}`,
-                        unit: "Percent",
-                        context: "Sample.Periodic",
-                        format: "Raw",
-                        measurand: "SoC",
-                        location: "EVSE"
-                    },
-                    {
-                        value: `${power.toFixed(2)}`,
-                        unit: "W",
-                        context: "Sample.Periodic",
-                        format: "Raw",
-                        measurand: "Power.Active.Import",
-                        location: "Outlet"
-                    },
-                    {
-                        value: `${energyDelivered.toFixed(2)}`,
-                        unit: "A",
-                        context: "Sample.Periodic",
-                        format: "Raw",
-                        measurand: "Current.Import",
-                        location: "Outlet"
-                    },
-                    {
-                        value: `${meterValueCounter.toFixed(2)}`,
-                        unit: "Wh",
-                        context: "Sample.Periodic",
-                        format: "Raw",
-                        measurand: "Energy.Active.Import.Register",
-                        location: "Outlet"
-                    }
-                ]
-            };
-            this.sendMeterValues(connector.connectorId, transactionId, [meterValue]);
-            durationSeconds -= intervalSeconds;
-        }, intervalSeconds * 1000);
     }
 
     sendChangeAvailability(connectorId, type) {

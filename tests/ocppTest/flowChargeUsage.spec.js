@@ -1,19 +1,16 @@
-import { test, expect } from '@playwright/test';
-import OcppClient from '../../api/ocppClient';
-import { flowCharge } from '../../utils/testHelpers';
+import { test } from '../../fixtures/ocppFixture';
 import testData from '../../data/testData';
+import { flowCharge } from '../../utils/testHelpers';
 
-test('Flujo completo flowCharge', async () => {
-  // Extraer el idTag desde el objeto "authorize" del testData y renombrarlo
-  const { authorize: authDataObj, startTransaction: startData, statusData, connector } = testData;
-  const authIdTag = authDataObj.idTag;
-  
-  const wsUrl = process.env.WS_URL;
-  const chargePointId = process.env.CHARGE_POINT_ID;
-  const ocppClient = new OcppClient(wsUrl, chargePointId);
-  await ocppClient.connect();
+// Aumentar explícitamente el timeout para este archivo de prueba
+test.setTimeout(600000);
 
-  // Pasar authIdTag en lugar de authData
-  await flowCharge(ocppClient, authIdTag, startData, statusData, connector);
-  ocppClient.close();
+test.describe.serial('Flujo completo flowCharge', () => {
+  test('Enviar flowCharge', async ({ ocppClient }) => {
+    // Extraer el idTag desde el objeto "authorize" del testData y renombrarlo
+    const { authorize: authDataObj, startTransaction: startData, statusData, connector } = testData;
+    const authIdTag = authDataObj.idTag;
+
+    await flowCharge(ocppClient, authIdTag, startData, statusData, connector);
+  });
 });
