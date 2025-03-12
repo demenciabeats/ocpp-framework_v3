@@ -21,9 +21,10 @@ const apiConfig = {
     remoteStartFull: {
         name: "Remote Start Transaction",
         method: "POST",
-        url: "/evcaStartTransaction",
+        url: "https://charger.manager.qa.dhemax.link/evcaStartTransaction",
         defaultHeaders: {
-            "Content-Type": "application/json"
+            "Content-Type": "application/json",
+            "App-id": "CMS"
         },
         requiresAuth: true,
         expectedResponse: {
@@ -32,27 +33,28 @@ const apiConfig = {
         body: 
             {
                 "ocpiPhyConnectorId": 291,
-                "companyId": 5,
-                "userId": 75,
-                "locationId": 15,
+                "companyId": 61,
+                "userEvcaId": 75,
+                "userId": 25
               }       
     },
 
     remoteStop: {
         name: "Remote Stop Transaction",
         method: "POST",
-        url: "/evcaStopTransaction",
+        url: "https://charger.manager.qa.dhemax.link/evcaStopTransaction",
         defaultHeaders: {
-            "Content-Type": "application/json"
+            "Content-Type": "application/json",
+            "App-id": "CMS"
         },
         requiresAuth: true,
         expectedResponse: {
             status: 201
         },
         body: {
-            companyId: 5, 
-            transactionId: 8009
-        },
+            companyId: 61, 
+            transactionId: 
+        }
     },
     reset: {
         name: "Reset Station",
