@@ -57,17 +57,17 @@ const apiConfig = {
     reset: {
         name: "Reset Station",
         method: "POST",
-        url: "/em/station/reset",
+        url: "https://charger.manager.qa.dhemax.link/reset",
         defaultHeaders: {
             "Content-Type": "application/json",
             "App-id": "CMS"
         },
-        requiresAuth: true,
+        requiresAuth: false,
         expectedResponse: {
             status: 201
         },
         body: {
-            stationId: 456,
+            machineId: 456,
             resetType: "Hard"
         }
     },
@@ -165,6 +165,45 @@ const apiConfig = {
             status: 201
         },
         body: {}
+    },
+    login: {
+        name: "Login API",
+        method: "POST",
+        url: "http://localhost:3000/api/auth/login",
+        defaultHeaders: {
+            "Content-Type": "application/json",
+            "Accept": "application/json"
+        },
+        body: {
+            email: "admin@dhemax.com",
+            password: "12345"
+        },
+        extractToken: true,  // Guarda el token automáticamente
+        tokenPath: "token"   // Ruta en la respuesta donde está el token
+    },
+    api1: {
+        name: "API Protegida",
+        method: "GET",
+        url: "http://localhost:3000/api/users",
+        defaultHeaders: {
+            "Content-Type": "application/json"
+        },
+        requiresAuth: true,  // Indica que necesita autenticación
+        expectedResponse: {
+            status: 200
+        }
+    },
+    api2: {
+        name: "API Pública",
+        method: "GET",
+        url: "https://jsonplaceholder.typicode.com/posts/1",
+        defaultHeaders: {
+            "Content-Type": "application/json"
+        },
+        requiresAuth: false,
+        expectedResponse: {
+            status: 200
+        }  // API sin autenticación
     }
 };
 

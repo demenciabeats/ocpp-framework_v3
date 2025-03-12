@@ -37,6 +37,7 @@ test.describe.serial('@carga MeterValues', () => {
       });
       console.log('<= Respuesta StatusNotification:', statusRes);
     });
+    await new Promise(resolve => setTimeout(resolve, 30000));
     
     await test.step('Simular carga con MeterValues', async () => {
       const txId = stateManager.state.transactionId;

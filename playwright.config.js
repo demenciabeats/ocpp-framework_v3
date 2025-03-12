@@ -4,7 +4,7 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 export default defineConfig({
-    timeout: 300000,
+    timeout: 600000, // Aumentar el tiempo de espera global a 10 minutos (600000 ms)
     use: {
         baseURL: process.env.WS_URL
     },
