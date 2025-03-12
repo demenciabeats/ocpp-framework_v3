@@ -8,7 +8,10 @@ import {
     sendStatusNotification,
     sendChangeAvailability
 } from '../api/ocppMessages';
-import { generateAndSendMeterValues } from './meterValues';
+import { 
+    generateAndSendMeterValues, 
+    generateAndSendTriphaseMeterValues 
+} from './meterValues';
 
 export async function bootNotification(ocppClient, bootData) {
     const bootReqId = sendBootNotification(ocppClient, bootData);
@@ -61,77 +64,25 @@ export async function flowCharge(ocppClient, authData, startData, statusData, co
     await statusNotification(ocppClient, chargingStatus);
     console.log("Estado de carga enviado: Charging");
 
-    // Reducir el tiempo de espera inicial para no agotar el timeout del test
     console.log("Esperando 30 segundos antes de enviar MeterValues...");
     await new Promise(resolve => setTimeout(resolve, 30000));
 
-    // Reducir la cantidad de ciclos para completar más rápido
-    const cycles = 12; //(12 ciclos de 10 segundos)
-    let meterValueCounter = 0;
-    let currentSoc = connector.initialSoc;
-
+    let finalMeterValueCounter = 0;
     try {
-        console.log(`Iniciando envío de MeterValues: ${cycles} ciclos de 10 segundos...`);
-        // Enviar MeterValues: inmediato y cada 10 segundos por 2 minutos (12 ciclos)
-        for (let i = 0; i <= cycles; i++) {
-            console.log(`MeterValue ciclo ${i+1}/${cycles+1}`);
-            const now = new Date().toISOString();
-            const power = connector.maxPower * 1000; // Convertir kW a W
-            const energyDelivered = (power * 10) / 3600; // Energía en Wh para intervalo de 10 seg.
-            meterValueCounter += energyDelivered;
-            currentSoc += (energyDelivered / (connector.batteryCapacity * 1000)) * 100;
+        console.log("Iniciando envío de MeterValues...");
 
-            const meterValue = {
-                timestamp: now,
-                sampledValue: [
-                    {
-                        value: currentSoc.toFixed(2),
-                        unit: "Percent",
-                        context: "Sample.Periodic",
-                        format: "Raw",
-                        measurand: "SoC",
-                        location: "EVSE"
-                    },
-                    {
-                        value: power.toFixed(2),
-                        unit: "W",
-                        context: "Sample.Periodic",
-                        format: "Raw",
-                        measurand: "Power.Active.Import",
-                        location: "Outlet"
-                    },
-                    {
-                        value: energyDelivered.toFixed(2),
-                        unit: "A",
-                        context: "Sample.Periodic",
-                        format: "Raw",
-                        measurand: "Current.Import",
-                        location: "Outlet"
-                    },
-                    {
-                        value: meterValueCounter.toFixed(2),
-                        unit: "Wh",
-                        context: "Sample.Periodic",
-                        format: "Raw",
-                        measurand: "Energy.Active.Import.Register",
-                        location: "Outlet"
-                    }
-                ]
-            };
-            ocppClient.sendMeterValues(connector.connectorId, transactionId, [meterValue]);
+        // Para medición monofásica:
+        // finalMeterValueCounter = await generateAndSendMeterValues(ocppClient, transactionId);
 
-            if (i < cycles) {
-                await new Promise(resolve => setTimeout(resolve, 10000));
-            }
-        }
+        // Para medición trifásica:
+        finalMeterValueCounter = await generateAndSendTriphaseMeterValues(ocppClient, transactionId);
     } catch (error) {
         console.error('Error durante el envío de MeterValues:', error);
     } finally {
         console.log("Finalizando transacción...");
-        // Este bloque se ejecuta siempre, asegurando que se llame a stopTransaction
         const stopData = {
             transactionId,
-            meterStop: meterValueCounter,
+            meterStop: finalMeterValueCounter || 0,
             timestamp: new Date().toISOString()
         };
         await stopTransaction(ocppClient, stopData);
