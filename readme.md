@@ -49,3 +49,5 @@ son la base para configurar las peticiones API.
 ────────────────────────────────────────────── • El framework usa dos fuentes JSON:  - Generic: para peticiones generales (ej. login) y escenarios donde se inyecta token; definido en genericRequestConfig.json.  - CRUD: separamos las configuraciones para cada operación en la carpeta data/api. • El módulo genericClient.js utiliza axios para enviar la petición y valida la respuesta de acuerdo a la configuración definida. • En el flujo de autenticación, mediante el login se extrae el token y se guarda. Luego, todas las peticiones que requieren autenticación lo usan inyectándolo en el header "Authorization". • Esto permite crear escenarios en cascada donde, a partir del login, se ejecuten secuencias de peticiones (POST, PUT, GET, DELETE) para simular procesos completos de integración de API.
 
 Con este enfoque, tienes una arquitectura flexible en la que los JSON de configuración definen de forma declarativa cómo se deben ejecutar y validar las peticiones API, permitiendo tanto la ejecución de flujos CRUD como el uso de peticiones genéricas.
+
+666
