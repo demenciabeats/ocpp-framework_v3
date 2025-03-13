@@ -1,433 +1,112 @@
 [
   {
-    "timestamp": "2025-03-12T14:44:01.872Z",
+    "timestamp": "2025-03-13T01:34:00.672Z",
     "sampledValue": [
-      {
-        "value": "7333.33",
-        "unit": "W",
-        "context": "Sample.Periodic",
-        "measurand": "Power.Active.Import",
-        "phase": "L1"
-      },
-      {
-        "value": "7333.33",
-        "unit": "W",
-        "context": "Sample.Periodic",
-        "measurand": "Power.Active.Import",
-        "phase": "L2"
-      },
-      {
-        "value": "7333.33",
-        "unit": "W",
-        "context": "Sample.Periodic",
-        "measurand": "Power.Active.Import",
-        "phase": "L3"
-      },
-      {
-        "value": "20.12",
-        "unit": "Percent",
-        "measurand": "SoC"
-      },
-      {
-        "value": "61.11",
-        "unit": "Wh",
-        "measurand": "Energy.Active.Import.Register"
-      }
-    ]
-  },
-  {
-    "timestamp": "2025-03-12T14:44:11.886Z",
-    "sampledValue": [
-      {
-        "value": "7333.33",
-        "unit": "W",
-        "context": "Sample.Periodic",
-        "measurand": "Power.Active.Import",
-        "phase": "L1"
-      },
-      {
-        "value": "7333.33",
-        "unit": "W",
-        "context": "Sample.Periodic",
-        "measurand": "Power.Active.Import",
-        "phase": "L2"
-      },
-      {
-        "value": "7333.33",
-        "unit": "W",
-        "context": "Sample.Periodic",
-        "measurand": "Power.Active.Import",
-        "phase": "L3"
-      },
       {
         "value": "20.24",
         "unit": "Percent",
-        "measurand": "SoC"
+        "context": "Sample.Periodic",
+        "format": "Raw",
+        "measurand": "SoC",
+        "location": "EVSE"
+      },
+      {
+        "value": "22000.00",
+        "unit": "W",
+        "context": "Sample.Periodic",
+        "format": "Raw",
+        "measurand": "Power.Active.Import",
+        "location": "Outlet"
+      },
+      {
+        "value": "122.22",
+        "unit": "A",
+        "context": "Sample.Periodic",
+        "format": "Raw",
+        "measurand": "Current.Import",
+        "location": "Outlet"
       },
       {
         "value": "122.22",
         "unit": "Wh",
-        "measurand": "Energy.Active.Import.Register"
+        "context": "Sample.Periodic",
+        "format": "Raw",
+        "measurand": "Energy.Active.Import.Register",
+        "location": "Outlet"
       }
     ]
   },
   {
-    "timestamp": "2025-03-12T14:44:21.887Z",
+    "timestamp": "2025-03-13T01:34:20.672Z",
     "sampledValue": [
-      {
-        "value": "7333.33",
-        "unit": "W",
-        "context": "Sample.Periodic",
-        "measurand": "Power.Active.Import",
-        "phase": "L1"
-      },
-      {
-        "value": "7333.33",
-        "unit": "W",
-        "context": "Sample.Periodic",
-        "measurand": "Power.Active.Import",
-        "phase": "L2"
-      },
-      {
-        "value": "7333.33",
-        "unit": "W",
-        "context": "Sample.Periodic",
-        "measurand": "Power.Active.Import",
-        "phase": "L3"
-      },
-      {
-        "value": "20.37",
-        "unit": "Percent",
-        "measurand": "SoC"
-      },
-      {
-        "value": "183.33",
-        "unit": "Wh",
-        "measurand": "Energy.Active.Import.Register"
-      }
-    ]
-  },
-  {
-    "timestamp": "2025-03-12T14:44:31.901Z",
-    "sampledValue": [
-      {
-        "value": "7333.33",
-        "unit": "W",
-        "context": "Sample.Periodic",
-        "measurand": "Power.Active.Import",
-        "phase": "L1"
-      },
-      {
-        "value": "7333.33",
-        "unit": "W",
-        "context": "Sample.Periodic",
-        "measurand": "Power.Active.Import",
-        "phase": "L2"
-      },
-      {
-        "value": "7333.33",
-        "unit": "W",
-        "context": "Sample.Periodic",
-        "measurand": "Power.Active.Import",
-        "phase": "L3"
-      },
       {
         "value": "20.49",
         "unit": "Percent",
-        "measurand": "SoC"
+        "context": "Sample.Periodic",
+        "format": "Raw",
+        "measurand": "SoC",
+        "location": "EVSE"
+      },
+      {
+        "value": "22000.00",
+        "unit": "W",
+        "context": "Sample.Periodic",
+        "format": "Raw",
+        "measurand": "Power.Active.Import",
+        "location": "Outlet"
+      },
+      {
+        "value": "122.22",
+        "unit": "A",
+        "context": "Sample.Periodic",
+        "format": "Raw",
+        "measurand": "Current.Import",
+        "location": "Outlet"
       },
       {
         "value": "244.44",
         "unit": "Wh",
-        "measurand": "Energy.Active.Import.Register"
+        "context": "Sample.Periodic",
+        "format": "Raw",
+        "measurand": "Energy.Active.Import.Register",
+        "location": "Outlet"
       }
     ]
   },
   {
-    "timestamp": "2025-03-12T14:44:41.912Z",
+    "timestamp": "2025-03-13T01:34:40.673Z",
     "sampledValue": [
-      {
-        "value": "7333.33",
-        "unit": "W",
-        "context": "Sample.Periodic",
-        "measurand": "Power.Active.Import",
-        "phase": "L1"
-      },
-      {
-        "value": "7333.33",
-        "unit": "W",
-        "context": "Sample.Periodic",
-        "measurand": "Power.Active.Import",
-        "phase": "L2"
-      },
-      {
-        "value": "7333.33",
-        "unit": "W",
-        "context": "Sample.Periodic",
-        "measurand": "Power.Active.Import",
-        "phase": "L3"
-      },
-      {
-        "value": "20.61",
-        "unit": "Percent",
-        "measurand": "SoC"
-      },
-      {
-        "value": "305.56",
-        "unit": "Wh",
-        "measurand": "Energy.Active.Import.Register"
-      }
-    ]
-  },
-  {
-    "timestamp": "2025-03-12T14:44:51.917Z",
-    "sampledValue": [
-      {
-        "value": "7333.33",
-        "unit": "W",
-        "context": "Sample.Periodic",
-        "measurand": "Power.Active.Import",
-        "phase": "L1"
-      },
-      {
-        "value": "7333.33",
-        "unit": "W",
-        "context": "Sample.Periodic",
-        "measurand": "Power.Active.Import",
-        "phase": "L2"
-      },
-      {
-        "value": "7333.33",
-        "unit": "W",
-        "context": "Sample.Periodic",
-        "measurand": "Power.Active.Import",
-        "phase": "L3"
-      },
       {
         "value": "20.73",
         "unit": "Percent",
-        "measurand": "SoC"
+        "context": "Sample.Periodic",
+        "format": "Raw",
+        "measurand": "SoC",
+        "location": "EVSE"
+      },
+      {
+        "value": "22000.00",
+        "unit": "W",
+        "context": "Sample.Periodic",
+        "format": "Raw",
+        "measurand": "Power.Active.Import",
+        "location": "Outlet"
+      },
+      {
+        "value": "122.22",
+        "unit": "A",
+        "context": "Sample.Periodic",
+        "format": "Raw",
+        "measurand": "Current.Import",
+        "location": "Outlet"
       },
       {
         "value": "366.67",
         "unit": "Wh",
-        "measurand": "Energy.Active.Import.Register"
-      }
-    ]
-  },
-  {
-    "timestamp": "2025-03-12T14:45:01.930Z",
-    "sampledValue": [
-      {
-        "value": "7333.33",
-        "unit": "W",
         "context": "Sample.Periodic",
-        "measurand": "Power.Active.Import",
-        "phase": "L1"
-      },
-      {
-        "value": "7333.33",
-        "unit": "W",
-        "context": "Sample.Periodic",
-        "measurand": "Power.Active.Import",
-        "phase": "L2"
-      },
-      {
-        "value": "7333.33",
-        "unit": "W",
-        "context": "Sample.Periodic",
-        "measurand": "Power.Active.Import",
-        "phase": "L3"
-      },
-      {
-        "value": "20.86",
-        "unit": "Percent",
-        "measurand": "SoC"
-      },
-      {
-        "value": "427.78",
-        "unit": "Wh",
-        "measurand": "Energy.Active.Import.Register"
-      }
-    ]
-  },
-  {
-    "timestamp": "2025-03-12T14:45:11.938Z",
-    "sampledValue": [
-      {
-        "value": "7333.33",
-        "unit": "W",
-        "context": "Sample.Periodic",
-        "measurand": "Power.Active.Import",
-        "phase": "L1"
-      },
-      {
-        "value": "7333.33",
-        "unit": "W",
-        "context": "Sample.Periodic",
-        "measurand": "Power.Active.Import",
-        "phase": "L2"
-      },
-      {
-        "value": "7333.33",
-        "unit": "W",
-        "context": "Sample.Periodic",
-        "measurand": "Power.Active.Import",
-        "phase": "L3"
-      },
-      {
-        "value": "20.98",
-        "unit": "Percent",
-        "measurand": "SoC"
-      },
-      {
-        "value": "488.89",
-        "unit": "Wh",
-        "measurand": "Energy.Active.Import.Register"
-      }
-    ]
-  },
-  {
-    "timestamp": "2025-03-12T14:45:21.938Z",
-    "sampledValue": [
-      {
-        "value": "7333.33",
-        "unit": "W",
-        "context": "Sample.Periodic",
-        "measurand": "Power.Active.Import",
-        "phase": "L1"
-      },
-      {
-        "value": "7333.33",
-        "unit": "W",
-        "context": "Sample.Periodic",
-        "measurand": "Power.Active.Import",
-        "phase": "L2"
-      },
-      {
-        "value": "7333.33",
-        "unit": "W",
-        "context": "Sample.Periodic",
-        "measurand": "Power.Active.Import",
-        "phase": "L3"
-      },
-      {
-        "value": "21.10",
-        "unit": "Percent",
-        "measurand": "SoC"
-      },
-      {
-        "value": "550.00",
-        "unit": "Wh",
-        "measurand": "Energy.Active.Import.Register"
-      }
-    ]
-  },
-  {
-    "timestamp": "2025-03-12T14:45:31.949Z",
-    "sampledValue": [
-      {
-        "value": "7333.33",
-        "unit": "W",
-        "context": "Sample.Periodic",
-        "measurand": "Power.Active.Import",
-        "phase": "L1"
-      },
-      {
-        "value": "7333.33",
-        "unit": "W",
-        "context": "Sample.Periodic",
-        "measurand": "Power.Active.Import",
-        "phase": "L2"
-      },
-      {
-        "value": "7333.33",
-        "unit": "W",
-        "context": "Sample.Periodic",
-        "measurand": "Power.Active.Import",
-        "phase": "L3"
-      },
-      {
-        "value": "21.22",
-        "unit": "Percent",
-        "measurand": "SoC"
-      },
-      {
-        "value": "611.11",
-        "unit": "Wh",
-        "measurand": "Energy.Active.Import.Register"
-      }
-    ]
-  },
-  {
-    "timestamp": "2025-03-12T14:45:41.950Z",
-    "sampledValue": [
-      {
-        "value": "7333.33",
-        "unit": "W",
-        "context": "Sample.Periodic",
-        "measurand": "Power.Active.Import",
-        "phase": "L1"
-      },
-      {
-        "value": "7333.33",
-        "unit": "W",
-        "context": "Sample.Periodic",
-        "measurand": "Power.Active.Import",
-        "phase": "L2"
-      },
-      {
-        "value": "7333.33",
-        "unit": "W",
-        "context": "Sample.Periodic",
-        "measurand": "Power.Active.Import",
-        "phase": "L3"
-      },
-      {
-        "value": "21.34",
-        "unit": "Percent",
-        "measurand": "SoC"
-      },
-      {
-        "value": "672.22",
-        "unit": "Wh",
-        "measurand": "Energy.Active.Import.Register"
-      }
-    ]
-  },
-  {
-    "timestamp": "2025-03-12T14:45:51.959Z",
-    "sampledValue": [
-      {
-        "value": "7333.33",
-        "unit": "W",
-        "context": "Sample.Periodic",
-        "measurand": "Power.Active.Import",
-        "phase": "L1"
-      },
-      {
-        "value": "7333.33",
-        "unit": "W",
-        "context": "Sample.Periodic",
-        "measurand": "Power.Active.Import",
-        "phase": "L2"
-      },
-      {
-        "value": "7333.33",
-        "unit": "W",
-        "context": "Sample.Periodic",
-        "measurand": "Power.Active.Import",
-        "phase": "L3"
-      },
-      {
-        "value": "21.47",
-        "unit": "Percent",
-        "measurand": "SoC"
-      },
-      {
-        "value": "733.33",
-        "unit": "Wh",
-        "measurand": "Energy.Active.Import.Register"
+        "format": "Raw",
+        "measurand": "Energy.Active.Import.Register",
+        "location": "Outlet"
       }
     ]
   }

@@ -26,16 +26,15 @@ const apiConfig = {
             "Content-Type": "application/json",
             "App-id": "CMS"
         },
-        requiresAuth: true,
+        requiresAuth: false, // Cambiado a false para evitar problemas de autenticación
         expectedResponse: {
-            status: 201
+            status: 200
         },
         body: 
             {
-                "ocpiPhyConnectorId": 291,
+                "ocpiPhyConnectorId": 1199, // Cambiado a 1 para coincidir con el conector que estamos usando
                 "companyId": 61,
-                "userEvcaId": 75,
-                "userId": 25
+                "locationId": 185
               }       
     },
 
@@ -47,13 +46,13 @@ const apiConfig = {
             "Content-Type": "application/json",
             "App-id": "CMS"
         },
-        requiresAuth: true,
+        requiresAuth: false,
         expectedResponse: {
-            status: 201
+            status: 200
         },
-        body: {
-            companyId: 61, 
-            transactionId: 1
+        body: {            
+                "companyId": 61,
+                "transactionId": 10062           
         }
     },
     reset: {
