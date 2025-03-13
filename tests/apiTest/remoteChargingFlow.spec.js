@@ -5,10 +5,8 @@ import { listenForCentralSystemMessage, sendStartTransaction, sendStatusNotifica
 
 test.describe('Flujo de carga remota', () => {
   test('Carga remota con Start/Stop Transaction', async () => {
-    // 1. Tomar la config para RemoteStartTransaction del apiConfig
     const remoteStartConfig = {
       ...apiConfig.remoteStartFull,
-      // Sobrescribir parámetros si se requiere
       body: {
         ...apiConfig.remoteStartFull.body
       }

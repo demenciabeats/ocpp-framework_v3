@@ -53,7 +53,7 @@ const apiConfig = {
         },
         body: {
             companyId: 61, 
-            transactionId: 
+            transactionId: 1
         }
     },
     reset: {
